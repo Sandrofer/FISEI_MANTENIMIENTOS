@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/FISEI.Auth.API/">
+    <Project Path="services/FISEI.Auth.API/FISEI.Auth.API/FISEI.Auth.API.csproj" />
+  </Folder>
+  <Folder Name="/shared/" />
+  <Folder Name="/shared/FISEI.Shared/">
+    <Project Path="shared/FISEI.Shared/FISEI.Shared/FISEI.Shared.csproj" />
+  </Folder>
+</Solution>
