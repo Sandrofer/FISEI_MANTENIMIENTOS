@@ -1,6 +1,22 @@
-@FISEI.Auth.API_HostAddress = http://localhost:5260
+@host = http://localhost:5260
 
-GET {{FISEI.Auth.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### Login
+POST {{host}}/api/auth/login
+Content-Type: application/json
 
-###
+{
+    "correo": "sandro@fisei.com",
+    "password": "password"
+}
+
+### Generar hash
+GET http://localhost:5260/api/auth/hash/Admin123
+
+### Login
+POST http://localhost:5260/api/auth/login
+Content-Type: application/json
+
+{
+    "correo": "sandro@fisei.com",
+    "password": "Admin123"
+}
