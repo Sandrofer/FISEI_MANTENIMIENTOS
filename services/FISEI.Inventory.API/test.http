@@ -1,0 +1,25 @@
+### Registrar equipo nuevo
+POST http://localhost:5064/api/inventario/individual
+Content-Type: application/json
+
+{
+  "numeroSerie": "DELL-003",
+  "marca": "Dell",
+  "modelo": "Inspiron 15",
+  "procesador": "Intel Core i5",
+  "laboratorio": "Laboratorio 1",
+  "fechaCompra": "2024-01-15"
+}
+
+### Probar número de serie duplicado
+POST http://localhost:5064/api/inventario/individual
+Content-Type: application/json
+
+{
+  "numeroSerie": "DELL-003",
+  "marca": "HP",
+  "modelo": "ProBook",
+  "procesador": "Intel Core i7",
+  "laboratorio": "Laboratorio 2",
+  "fechaCompra": "2024-03-10"
+}

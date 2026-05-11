@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {}
+    "C:\\Users\\enriq\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {
+    "C:\\Users\\enriq\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
+        "projectUniqueName": "C:\\Users\\enriq\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
         "projectName": "FISEI.Auth.API",
-        "projectPath": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
-        "packagesPath": "C:\\Users\\ikerf\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\obj\\",
+        "projectPath": "C:\\Users\\enriq\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
+        "packagesPath": "C:\\Users\\enriq\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\enriq\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ikerf\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\enriq\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -92,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
