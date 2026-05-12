@@ -14,86 +14,121 @@ export const AdminPage = () => {
     navigate('/login');
   };
 
+  const userInitial = usuario?.nombre?.charAt(0).toUpperCase() ?? 'A';
+
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-blue-800 text-white flex flex-col">
-        <div className="p-6 border-b border-blue-700">
-          <h1 className="text-xl font-bold">FISEI</h1>
-          <p className="text-blue-300 text-sm">Mantenimientos</p>
+    <div className="admin-layout">
+      <aside className="sidebar">
+        <div className="sidebar__brand">
+          <span className="brand-mark">FI</span>
+          <h1 className="sidebar__title">FISEI</h1>
+          <p className="sidebar__subtitle">Mantenimientos institucionales</p>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+
+        <nav className="sidebar__nav" aria-label="Navegacion principal">
           <button
             onClick={() => setSeccion('inicio')}
-            className={`w-full text-left px-4 py-2 rounded-lg ${seccion === 'inicio' ? 'bg-blue-600' : 'hover:bg-blue-700'}`}
+            className={`sidebar__link ${seccion === 'inicio' ? 'sidebar__link--active' : ''}`}
           >
-             Inicio
+            <span className="sidebar__icon">IN</span>
+            Inicio
           </button>
           <button
             onClick={() => setSeccion('usuarios')}
-            className={`w-full text-left px-4 py-2 rounded-lg ${seccion === 'usuarios' ? 'bg-blue-600' : 'hover:bg-blue-700'}`}
+            className={`sidebar__link ${seccion === 'usuarios' ? 'sidebar__link--active' : ''}`}
           >
-             Usuarios
+            <span className="sidebar__icon">US</span>
+            Usuarios
           </button>
           <button
             onClick={() => setSeccion('inventario')}
-            className={`w-full text-left px-4 py-2 rounded-lg ${seccion === 'inventario' ? 'bg-blue-600' : 'hover:bg-blue-700'}`}
+            className={`sidebar__link ${seccion === 'inventario' ? 'sidebar__link--active' : ''}`}
           >
-             Inventario
+            <span className="sidebar__icon">IV</span>
+            Inventario
           </button>
           <button
             onClick={() => navigate('/admin/registrar-equipo')}
-            className="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="sidebar__link"
           >
-             Registrar Equipo
+            <span className="sidebar__icon">EQ</span>
+            Registrar equipo
           </button>
         </nav>
-        <div className="p-4 border-t border-blue-700">
-          <p className="text-sm text-blue-300 mb-2">{usuario?.nombre}</p>
-          <button onClick={handleLogout} className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 text-sm">
-            Cerrar sesión
+
+        <div className="sidebar__footer">
+          <div className="sidebar__user">
+            <span className="sidebar__avatar">{userInitial}</span>
+            <div>
+              <p className="sidebar__name">{usuario?.nombre}</p>
+              <p className="sidebar__role">Administrador</p>
+            </div>
+          </div>
+          <button onClick={handleLogout} className="btn btn--danger btn--full">
+            Cerrar sesion
           </button>
         </div>
       </aside>
 
-      {/* Contenido */}
-      <main className="flex-1 p-8">
-        {seccion === 'inicio' && (
+      <main className="main-panel">
+        <header className="topbar">
           <div>
-            <h2 className="text-2xl font-bold text-blue-800 mb-4">Bienvenido, {usuario?.nombre} 👋</h2>
-            <p className="text-gray-500 mb-6">Selecciona una opción del menú.</p>
+            <p className="topbar__eyebrow">Panel administrativo</p>
+            <h2 className="topbar__title">Gestion de mantenimientos FISEI</h2>
+          </div>
+          <span className="topbar__meta">Universidad Tecnica de Ambato</span>
+        </header>
 
-            {/* Tarjetas de acceso rápido */}
-            <div className="grid grid-cols-2 gap-4">
-              <div
-                onClick={() => setSeccion('usuarios')}
-                className="bg-white rounded-xl shadow p-6 cursor-pointer hover:shadow-md border-l-4 border-blue-500"
-              >
-                <p className="text-3xl mb-2">👥</p>
-                <h3 className="font-bold text-gray-800">Gestión de Usuarios</h3>
-                <p className="text-sm text-gray-500">Crear y administrar usuarios del sistema</p>
+        {seccion === 'inicio' && (
+          <section className="page-section">
+            <div className="dashboard-hero">
+              <div className="hero-panel">
+                <div className="hero-panel__content">
+                  <h2>Bienvenido, {usuario?.nombre}</h2>
+                  <p>
+                    Administra usuarios, equipos tecnologicos y hojas de vida desde un panel limpio,
+                    ordenado y orientado a la operacion institucional.
+                  </p>
+                  <div className="hero-actions">
+                    <button onClick={() => setSeccion('inventario')} className="btn btn--outline">
+                      Revisar inventario
+                    </button>
+                    <button onClick={() => navigate('/admin/registrar-equipo')} className="btn btn--secondary">
+                      Registrar equipo
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <div
-                onClick={() => setSeccion('inventario')}
-                className="bg-white rounded-xl shadow p-6 cursor-pointer hover:shadow-md border-l-4 border-slate-500"
-              >
-                <p className="text-3xl mb-2">📋</p>
-                <h3 className="font-bold text-gray-800">Inventario</h3>
-                <p className="text-sm text-gray-500">Consultar equipos y hojas de vida</p>
-              </div>
-
-              <div
-                onClick={() => navigate('/admin/registrar-equipo')}
-                className="bg-white rounded-xl shadow p-6 cursor-pointer hover:shadow-md border-l-4 border-green-500"
-              >
-                <p className="text-3xl mb-2">💻</p>
-                <h3 className="font-bold text-gray-800">Registrar Equipo</h3>
-                <p className="text-sm text-gray-500">Registrar un equipo tecnológico individual</p>
+              <div className="stat-card">
+                <span className="stat-card__label">Modulo activo</span>
+                <strong className="stat-card__value">3</strong>
+                <span className="stat-card__hint">Areas principales para la gestion del sistema</span>
               </div>
             </div>
-          </div>
+
+            <div className="dashboard-grid">
+              <button onClick={() => setSeccion('usuarios')} className="action-card">
+                <span className="action-card__icon">US</span>
+                <h3>Gestion de Usuarios</h3>
+                <p>Crear, revisar y administrar los perfiles autorizados del sistema.</p>
+              </button>
+
+              <button onClick={() => setSeccion('inventario')} className="action-card">
+                <span className="action-card__icon">IV</span>
+                <h3>Inventario</h3>
+                <p>Consultar equipos registrados, estados y hojas de vida tecnicas.</p>
+              </button>
+
+              <button onClick={() => navigate('/admin/registrar-equipo')} className="action-card">
+                <span className="action-card__icon">EQ</span>
+                <h3>Registrar Equipo</h3>
+                <p>Ingresar un nuevo activo tecnologico con sus datos institucionales.</p>
+              </button>
+            </div>
+          </section>
         )}
+
         {seccion === 'usuarios' && <UsuariosPage />}
         {seccion === 'inventario' && <InventarioPage />}
       </main>

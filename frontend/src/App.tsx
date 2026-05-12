@@ -5,6 +5,7 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { HojaVidaPage } from './pages/admin/HojaVidaPage';
 import RegistrarEquipoPage from './pages/inventario/RegistrarEquipoPage';
+import './App.css';
 
 function App() {
   return (

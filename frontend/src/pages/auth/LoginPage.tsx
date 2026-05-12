@@ -28,47 +28,50 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-lg p-10 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center text-blue-800 mb-2">FISEI</h1>
-        <p className="text-center text-gray-500 mb-8">Sistema de Gestión de Mantenimientos</p>
+    <main className="login-page">
+      <section className="login-card" aria-label="Inicio de sesion">
+        <div className="login-brand">
+          <span className="login-brand__mark">FI</span>
+          <h1>FISEI</h1>
+          <p>Sistema de Gestion de Mantenimientos</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Correo institucional</label>
+        <form onSubmit={handleSubmit} className="form-grid">
+          <div className="form-field form-field--full">
+            <label className="form-label" htmlFor="correo">Correo institucional</label>
             <input
+              id="correo"
               type="email"
               value={correo}
               onChange={e => setCorreo(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
               placeholder="usuario@uta.edu.ec"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <div className="form-field form-field--full">
+            <label className="form-label" htmlFor="password">Contrasena</label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
+              className="form-input"
+              placeholder="********"
               required
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {error && <p className="alert alert--error form-field--full">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={cargando}
-            className="w-full bg-blue-800 text-white py-2 rounded-lg font-semibold hover:bg-blue-900 transition disabled:opacity-50"
-          >
-            {cargando ? 'Ingresando...' : 'Ingresar'}
-          </button>
+          <div className="form-field--full">
+            <button type="submit" disabled={cargando} className="btn btn--primary btn--full">
+              {cargando ? 'Ingresando...' : 'Ingresar'}
+            </button>
+          </div>
         </form>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };

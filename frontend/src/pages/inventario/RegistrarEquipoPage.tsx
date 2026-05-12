@@ -31,9 +31,9 @@ export default function RegistrarEquipoPage() {
       setExito(resultado);
     } catch (err: any) {
       if (err.response?.status === 409) {
-        setError(`⚠️ ${err.response.data.mensaje}`);
+        setError(`Advertencia: ${err.response.data.mensaje}`);
       } else {
-        setError('❌ Error al registrar el equipo. Intente de nuevo.');
+        setError('Error al registrar el equipo. Intente de nuevo.');
       }
     } finally {
       setLoading(false);
@@ -41,84 +41,130 @@ export default function RegistrarEquipoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Registrar Equipo</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <main className="register-shell">
+      <div className="register-container">
+        <section className="section-header">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Número de Serie</label>
-            <input name="numeroSerie" value={form.numeroSerie} onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: DELL-001" required />
+            <p className="section-kicker">Inventario institucional</p>
+            <h1 className="section-title">Registrar Equipo</h1>
+            <p className="section-description">
+              Complete la informacion del activo tecnologico para incorporarlo al inventario.
+            </p>
           </div>
+        </section>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Marca</label>
-            <input name="marca" value={form.marca} onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: Dell" required />
-          </div>
+        <section className="card register-card">
+          <form onSubmit={handleSubmit} className="form-grid">
+            <div className="form-field">
+              <label className="form-label" htmlFor="numeroSerie">Numero de Serie</label>
+              <input
+                id="numeroSerie"
+                name="numeroSerie"
+                value={form.numeroSerie}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="Ej: DELL-001"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Modelo</label>
-            <input name="modelo" value={form.modelo} onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: Inspiron 15" required />
-          </div>
+            <div className="form-field">
+              <label className="form-label" htmlFor="marca">Marca</label>
+              <input
+                id="marca"
+                name="marca"
+                value={form.marca}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="Ej: Dell"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Procesador</label>
-            <input name="procesador" value={form.procesador} onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: Intel Core i5" required />
-          </div>
+            <div className="form-field">
+              <label className="form-label" htmlFor="modelo">Modelo</label>
+              <input
+                id="modelo"
+                name="modelo"
+                value={form.modelo}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="Ej: Inspiron 15"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Laboratorio</label>
-            <select name="laboratorio" value={form.laboratorio} onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required>
-              <option value="">Seleccione un laboratorio</option>
-              <option value="Laboratorio 1">Laboratorio 1</option>
-              <option value="Laboratorio 2">Laboratorio 2</option>
-              <option value="Laboratorio 3">Laboratorio 3</option>
-              <option value="Laboratorio 4">Laboratorio 4</option>
-            </select>
-          </div>
+            <div className="form-field">
+              <label className="form-label" htmlFor="procesador">Procesador</label>
+              <input
+                id="procesador"
+                name="procesador"
+                value={form.procesador}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="Ej: Intel Core i5"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Fecha de Compra</label>
-            <input name="fechaCompra" type="date" value={form.fechaCompra} onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required />
-          </div>
+            <div className="form-field">
+              <label className="form-label" htmlFor="laboratorio">Laboratorio</label>
+              <select
+                id="laboratorio"
+                name="laboratorio"
+                value={form.laboratorio}
+                onChange={handleChange}
+                className="form-select"
+                required
+              >
+                <option value="">Seleccione un laboratorio</option>
+                <option value="Laboratorio 1">Laboratorio 1</option>
+                <option value="Laboratorio 2">Laboratorio 2</option>
+                <option value="Laboratorio 3">Laboratorio 3</option>
+                <option value="Laboratorio 4">Laboratorio 4</option>
+              </select>
+            </div>
 
-          <button type="submit" disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50">
-            {loading ? 'Registrando...' : 'Registrar Equipo'}
-          </button>
-        </form>
+            <div className="form-field">
+              <label className="form-label" htmlFor="fechaCompra">Fecha de Compra</label>
+              <input
+                id="fechaCompra"
+                name="fechaCompra"
+                type="date"
+                value={form.fechaCompra}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
 
-        {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            {error}
-          </div>
-        )}
+            <div className="form-actions form-field--full">
+              <button type="submit" disabled={loading} className="btn btn--primary">
+                {loading ? 'Registrando...' : 'Registrar Equipo'}
+              </button>
+            </div>
+          </form>
 
-        {exito && (
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-            <p className="font-semibold">✅ Equipo registrado exitosamente</p>
-            <p className="text-sm mt-1">Serie: {exito.numeroSerie} — {exito.marca} {exito.modelo}</p>
-            <p className="text-sm font-medium mt-2">Mantenimientos programados:</p>
-            <ul className="text-sm list-disc list-inside">
-              {exito.mantenimientos.map(m => (
-                <li key={m.id}>{m.fechaProgramada} — {m.estado}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {error && (
+            <div className="alert alert--error mt-16">
+              {error}
+            </div>
+          )}
+
+          {exito && (
+            <div className="alert alert--success mt-16">
+              <p><strong>Equipo registrado exitosamente</strong></p>
+              <p>Serie: {exito.numeroSerie} - {exito.marca} {exito.modelo}</p>
+              <p><strong>Mantenimientos programados:</strong></p>
+              <ul className="result-list">
+                {exito.mantenimientos.map(m => (
+                  <li key={m.id}>{m.fechaProgramada} - {m.estado}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
