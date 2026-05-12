@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { UsuariosPage } from './UsuariosPage';
+import { InventarioPage } from './InventarioPage';
 
 export const AdminPage = () => {
   const { usuario, cerrarSesion } = useAuth();
@@ -33,6 +34,12 @@ export const AdminPage = () => {
             className={`w-full text-left px-4 py-2 rounded-lg ${seccion === 'usuarios' ? 'bg-blue-600' : 'hover:bg-blue-700'}`}
           >
              Usuarios
+          </button>
+          <button
+            onClick={() => setSeccion('inventario')}
+            className={`w-full text-left px-4 py-2 rounded-lg ${seccion === 'inventario' ? 'bg-blue-600' : 'hover:bg-blue-700'}`}
+          >
+             Inventario
           </button>
           <button
             onClick={() => navigate('/admin/registrar-equipo')}
@@ -68,6 +75,15 @@ export const AdminPage = () => {
               </div>
 
               <div
+                onClick={() => setSeccion('inventario')}
+                className="bg-white rounded-xl shadow p-6 cursor-pointer hover:shadow-md border-l-4 border-slate-500"
+              >
+                <p className="text-3xl mb-2">📋</p>
+                <h3 className="font-bold text-gray-800">Inventario</h3>
+                <p className="text-sm text-gray-500">Consultar equipos y hojas de vida</p>
+              </div>
+
+              <div
                 onClick={() => navigate('/admin/registrar-equipo')}
                 className="bg-white rounded-xl shadow p-6 cursor-pointer hover:shadow-md border-l-4 border-green-500"
               >
@@ -79,6 +95,7 @@ export const AdminPage = () => {
           </div>
         )}
         {seccion === 'usuarios' && <UsuariosPage />}
+        {seccion === 'inventario' && <InventarioPage />}
       </main>
     </div>
   );

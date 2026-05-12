@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 import { AdminPage } from './pages/admin/AdminPage';
+import { HojaVidaPage } from './pages/admin/HojaVidaPage';
 import RegistrarEquipoPage from './pages/inventario/RegistrarEquipoPage';
 
 function App() {
@@ -19,6 +20,11 @@ function App() {
           <Route path="/admin/registrar-equipo" element={
             <ProtectedRoute rolesPermitidos={['Administrador']}>
               <RegistrarEquipoPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/inventario/:id/hoja-vida" element={
+            <ProtectedRoute rolesPermitidos={['Administrador', 'T\u00e9cnico', 'Tecnico']}>
+              <HojaVidaPage />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" replace />} />

@@ -84,4 +84,70 @@ public class InventarioService
             }).ToList()
         };
     }
+
+    public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync()
+    {
+        return await _context.Equipos
+            .AsNoTracking()
+            .OrderByDescending(e => e.FechaRegistro)
+            .Select(e => new EquipoResponseDto
+            {
+                Id = e.Id,
+                NumeroSerie = e.NumeroSerie,
+                Marca = e.Marca,
+                Modelo = e.Modelo,
+                Procesador = e.Procesador,
+                Laboratorio = e.Laboratorio,
+                FechaCompra = e.FechaCompra,
+                Estado = e.Estado,
+                FechaRegistro = e.FechaRegistro,
+                Mantenimientos = new List<MantenimientoResponseDto>()
+            })
+            .ToListAsync();
+    }
+
+    public async Task<HojaVidaDto?> ObtenerHojaVidaEquipoAsync(int id)
+    {
+        var equipo = await _context.Equipos
+            .AsNoTracking()
+            .Where(e => e.Id == id)
+            .Select(e => new EquipoResponseDto
+            {
+                Id = e.Id,
+                NumeroSerie = e.NumeroSerie,
+                Marca = e.Marca,
+                Modelo = e.Modelo,
+                Procesador = e.Procesador,
+                Laboratorio = e.Laboratorio,
+                FechaCompra = e.FechaCompra,
+                Estado = e.Estado,
+                FechaRegistro = e.FechaRegistro,
+                Mantenimientos = new List<MantenimientoResponseDto>()
+            })
+            .FirstOrDefaultAsync();
+
+        if (equipo is null)
+        {
+            return null;
+        }
+
+        var mantenimientos = await _context.Mantenimientos
+            .AsNoTracking()
+            .Where(m => m.EquipoId == id)
+            .OrderByDescending(m => m.FechaProgramada)
+            .Select(m => new MantenimientoDto
+            {
+                Id = m.Id,
+                FechaProgramada = m.FechaProgramada,
+                Estado = m.Estado,
+                Observaciones = m.Observaciones
+            })
+            .ToListAsync();
+
+        return new HojaVidaDto
+        {
+            Equipo = equipo,
+            Mantenimientos = mantenimientos
+        };
+    }
 }

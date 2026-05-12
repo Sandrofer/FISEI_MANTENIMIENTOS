@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FISEI.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aba3665bf84d321df116108fadec910805bd1feb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66ed4fe87310ddeca343833973620ed37783985b")]
 [assembly: System.Reflection.AssemblyProductAttribute("FISEI.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FISEI.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

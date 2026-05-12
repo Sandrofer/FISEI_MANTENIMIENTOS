@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FISEI.Inventory.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ca025991df726c71d1fe604e1b82d1d32a7b1282")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66ed4fe87310ddeca343833973620ed37783985b")]
 [assembly: System.Reflection.AssemblyProductAttribute("FISEI.Inventory.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FISEI.Inventory.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

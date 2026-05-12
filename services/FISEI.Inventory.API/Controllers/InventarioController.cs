@@ -32,4 +32,24 @@ public class InventarioController : ControllerBase
             return StatusCode(500, new { mensaje = "Error al registrar el equipo", detalle = ex.Message });
         }
     }
+
+    [HttpGet("equipos")]
+    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos()
+    {
+        var equipos = await _service.ObtenerEquiposAsync();
+        return Ok(equipos);
+    }
+
+    [HttpGet("equipos/{id:int}/hoja-vida")]
+    public async Task<IActionResult> ObtenerHojaVidaEquipo(int id)
+    {
+        var hojaVida = await _service.ObtenerHojaVidaEquipoAsync(id);
+
+        if (hojaVida is null)
+        {
+            return NotFound(new { message = "Equipo no encontrado" });
+        }
+
+        return Ok(hojaVida);
+    }
 }
