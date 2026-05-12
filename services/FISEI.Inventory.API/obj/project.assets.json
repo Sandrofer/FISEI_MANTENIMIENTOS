@@ -3096,19 +3096,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Shanthallleon\\.nuget\\packages\\": {}
+    "C:\\Users\\ikerf\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Inventory.API\\FISEI.Inventory.API.csproj",
+      "projectUniqueName": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Inventory.API\\FISEI.Inventory.API.csproj",
       "projectName": "FISEI.Inventory.API",
-      "projectPath": "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Inventory.API\\FISEI.Inventory.API.csproj",
-      "packagesPath": "C:\\Users\\Shanthallleon\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Inventory.API\\obj\\",
+      "projectPath": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Inventory.API\\FISEI.Inventory.API.csproj",
+      "packagesPath": "C:\\Users\\ikerf\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Inventory.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Shanthallleon\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ikerf\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"

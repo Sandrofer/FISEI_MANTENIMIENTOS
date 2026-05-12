@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FISEI.Auth.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b2c49d2e40bff6c5aec475e15788f36fde22f1a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+857e59501f6c311adba371f38b696725dd8018cc")]
 [assembly: System.Reflection.AssemblyProductAttribute("FISEI.Auth.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FISEI.Auth.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

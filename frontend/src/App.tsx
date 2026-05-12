@@ -4,6 +4,7 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { HojaVidaPage } from './pages/admin/HojaVidaPage';
+import { LabPage } from './pages/lab/LabPage';
 import RegistrarEquipoPage from './pages/inventario/RegistrarEquipoPage';
 import './App.css';
 
@@ -16,6 +17,21 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute rolesPermitidos={['Administrador']}>
               <AdminPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/lab" element={
+            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+              <LabPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/lab/registrar-equipo" element={
+            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+              <RegistrarEquipoPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/lab/inventario/:id/hoja-vida" element={
+            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+              <HojaVidaPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/registrar-equipo" element={

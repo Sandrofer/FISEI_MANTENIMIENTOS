@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {}
+    "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {
+    "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
+        "projectUniqueName": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
         "projectName": "FISEI.Auth.API",
-        "projectPath": "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
-        "packagesPath": "C:\\Users\\Shanthallleon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Shanthallleon\\FISEI_MANTENIMIENTOS\\services\\FISEI.Auth.API\\FISEI.Auth.API\\obj\\",
+        "projectPath": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\FISEI.Auth.API.csproj",
+        "packagesPath": "C:\\Users\\ikerf\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ikerf\\FISEI-Mantenimientos\\services\\FISEI.Auth.API\\FISEI.Auth.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Shanthallleon\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ikerf\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"

@@ -14,9 +14,14 @@ export const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    const correoNormalizado = correo.trim().toLowerCase();
+    if (!correoNormalizado.endsWith('@uta.edu.ec')) {
+      setError('El correo debe ser institucional (@uta.edu.ec)');
+      return;
+    }
     setCargando(true);
     try {
-      const data = await login({ correo, password });
+      const data = await login({ correo: correoNormalizado, password });
       guardarSesion(data);
       if (data.rol === 'Administrador') navigate('/admin');
       else navigate('/lab');

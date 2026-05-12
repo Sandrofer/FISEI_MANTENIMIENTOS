@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { getHojaVidaEquipo } from '../../services/inventarioService';
 import type { HojaVida } from '../../services/inventarioService';
@@ -7,9 +7,11 @@ import type { HojaVida } from '../../services/inventarioService';
 export const HojaVidaPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [hojaVida, setHojaVida] = useState<HojaVida | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const panelPath = location.pathname.startsWith('/lab') ? '/lab' : '/admin';
 
   useEffect(() => {
     const cargarHojaVida = async () => {
@@ -63,7 +65,7 @@ export const HojaVidaPage = () => {
         <div className="resource-container">
           <section className="card card--padded">
             <p className="alert alert--error">{error ?? 'No se encontro informacion del equipo.'}</p>
-            <button onClick={() => navigate('/admin')} className="btn btn--primary mt-16">
+            <button onClick={() => navigate(panelPath)} className="btn btn--primary mt-16">
               Volver
             </button>
           </section>
@@ -79,7 +81,7 @@ export const HojaVidaPage = () => {
       <div className="resource-container">
         <div className="section-header">
           <div>
-            <Link to="/admin" className="back-link">Volver al panel</Link>
+            <Link to={panelPath} className="back-link">Volver al panel</Link>
             <h1 className="section-title mt-16">Hoja de vida del activo</h1>
             <p className="section-description">{equipo.marca} {equipo.modelo} - {equipo.numeroSerie}</p>
           </div>

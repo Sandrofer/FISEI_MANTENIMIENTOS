@@ -4,7 +4,11 @@ import { AxiosError } from 'axios';
 import { obtenerEquipos } from '../../services/inventarioService';
 import type { Equipo } from '../../services/inventarioService';
 
-export const InventarioPage = () => {
+interface InventarioPageProps {
+  basePath?: '/admin' | '/lab';
+}
+
+export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => {
   const navigate = useNavigate();
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +48,7 @@ export const InventarioPage = () => {
           <h2 className="section-title">Inventario</h2>
           <p className="section-description">Equipos registrados en el sistema y acceso a sus hojas de vida.</p>
         </div>
-        <button onClick={() => navigate('/admin/registrar-equipo')} className="btn btn--primary">
+        <button onClick={() => navigate(`${basePath}/registrar-equipo`)} className="btn btn--primary">
           Registrar equipo
         </button>
       </div>
@@ -84,7 +88,7 @@ export const InventarioPage = () => {
                     </td>
                     <td className="data-table__right">
                       <button
-                        onClick={() => navigate(`/admin/inventario/${equipo.id}/hoja-vida`)}
+                        onClick={() => navigate(`${basePath}/inventario/${equipo.id}/hoja-vida`)}
                         className="btn btn--outline btn--sm"
                       >
                         Ver hoja de vida
