@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/services/">
+    <Project Path="gateway/FISEI.Gateway/FISEI.Gateway.csproj" />
     <Project Path="services/FISEI.Inventory.API/FISEI.Inventory.API.csproj" />
     <Project Path="services/FISEI.Maintenance.API/FISEI.Maintenance.API.csproj" />
   </Folder>

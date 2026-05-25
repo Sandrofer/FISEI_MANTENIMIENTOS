@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5082/api/mantenimientos';
+const API_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api'}/mantenimientos`;
 
 const getHeaders = () => ({
   headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
