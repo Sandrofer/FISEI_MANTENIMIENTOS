@@ -46,6 +46,13 @@ export const LabPage = () => {
             <span className="sidebar__icon">EQ</span>
             Registrar equipo
           </button>
+          <button
+            onClick={() => navigate('/lab/mantenimientos')}
+            className={`sidebar__link ${location.pathname.includes('/mantenimientos') ? 'sidebar__link--active' : ''}`}
+          >
+            <span className="sidebar__icon">MT</span>
+            Mantenimientos
+          </button>
         </nav>
 
         <div className="sidebar__footer">
@@ -110,6 +117,12 @@ export const LabPage = () => {
                 <span className="action-card__icon">EQ</span>
                 <h3>Registrar Equipo</h3>
                 <p>Ingresar un nuevo activo tecnologico con sus datos institucionales.</p>
+              </button>
+
+              <button onClick={() => navigate('/lab/mantenimientos')} className="action-card">
+                <span className="action-card__icon">MT</span>
+                <h3>Mantenimientos</h3>
+                <p>Gestionar peticiones de mantenimiento preventivo y correctivo.</p>
               </button>
             </div>
           </section>

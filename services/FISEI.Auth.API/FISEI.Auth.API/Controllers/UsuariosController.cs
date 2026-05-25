@@ -9,7 +9,6 @@ namespace FISEI.Auth.API.Controllers;
 
 [ApiController]
 [Route("api/usuarios")]
-[Authorize(Roles = "Administrador")]
 public class UsuariosController : ControllerBase
 {
     private readonly AuthDbContext _context;
@@ -20,6 +19,7 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrador,Laboratorista")]
     public async Task<IActionResult> GetUsuarios([FromQuery] int pagina = 1, [FromQuery] int tamano = 10)
     {
         var total = await _context.Usuarios.CountAsync();
@@ -41,6 +41,7 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CrearUsuario([FromBody] CrearUsuarioDto dto)
     {
         if (await _context.Usuarios.AnyAsync(u => u.Correo == dto.Correo))
@@ -63,6 +64,7 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpPut("{id}/rol")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ActualizarRol(int id, [FromBody] ActualizarRolDto dto)
     {
         var usuario = await _context.Usuarios.FindAsync(id);

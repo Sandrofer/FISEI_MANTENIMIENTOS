@@ -1,0 +1,6 @@
+@FISEI.Maintenance.API_HostAddress = http://localhost:5108
+
+GET {{FISEI.Maintenance.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -6,6 +6,8 @@ import { AdminPage } from './pages/admin/AdminPage';
 import { HojaVidaPage } from './pages/admin/HojaVidaPage';
 import { LabPage } from './pages/lab/LabPage';
 import RegistrarEquipoPage from './pages/inventario/RegistrarEquipoPage';
+import { MantenimientosPage } from './pages/mantenimiento/MantenimientosPage';
+import { MantenimientoForm } from './pages/mantenimiento/MantenimientoForm';
 import './App.css';
 
 function App() {
@@ -40,8 +42,32 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/admin/inventario/:id/hoja-vida" element={
-            <ProtectedRoute rolesPermitidos={['Administrador', 'T\u00e9cnico', 'Tecnico']}>
+            <ProtectedRoute rolesPermitidos={['Administrador', 'Técnico', 'Tecnico']}>
               <HojaVidaPage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Mantenimientos Lab */}
+          <Route path="/lab/mantenimientos" element={
+            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+              <MantenimientosPage basePath="/lab" />
+            </ProtectedRoute>
+          } />
+          <Route path="/lab/mantenimientos/nuevo" element={
+            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+              <MantenimientoForm />
+            </ProtectedRoute>
+          } />
+
+          {/* Mantenimientos Admin */}
+          <Route path="/admin/mantenimientos" element={
+            <ProtectedRoute rolesPermitidos={['Administrador']}>
+              <MantenimientosPage basePath="/admin" />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/mantenimientos/nuevo" element={
+            <ProtectedRoute rolesPermitidos={['Administrador']}>
+              <MantenimientoForm />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" replace />} />
