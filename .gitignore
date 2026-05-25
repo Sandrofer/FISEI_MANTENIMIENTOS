@@ -6,3 +6,38 @@ frontend/.env
 node_modules/ 
 frontend/dist/ 
 frontend/.env 
+
+# --- .NET (Servicios, API y Shared) ---
+# Carpetas de compilación y salida
+**/bin/
+**/obj/
+# Archivos de configuración de usuario de Visual Studio
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# --- React / Vite (Frontend) ---
+# Dependencias de paquetes
+node_modules/
+# Archivos de build y despliegue
+dist/
+dist-ssr/
+*.local
+
+# --- Base de Datos ---
+# Archivos de SQL Server y caché de Entity Framework
+*.db
+*.db-shm
+*.db-wal
+*.mdf
+*.ldf
+
+# --- Sistema operativo y IDEs ---
+.DS_Store
+Thumbs.db
+*.log
+
+
