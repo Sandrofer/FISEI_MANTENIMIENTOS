@@ -34,6 +34,7 @@ export interface CrearMantenimientoDto {
   responsable: string;
   prioridad: string;
   observaciones?: string;
+  fechaProgramada?: string;
 }
 
 export interface CompletarMantenimientoDto {

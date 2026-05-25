@@ -31,6 +31,7 @@ public class CrearMantenimientoDto
     public string Tipo { get; set; } = string.Empty;
     public string Responsable { get; set; } = string.Empty;
     public string Prioridad { get; set; } = string.Empty;
+    public DateOnly? FechaProgramada { get; set; }
     public string? Observaciones { get; set; }
 }
 
