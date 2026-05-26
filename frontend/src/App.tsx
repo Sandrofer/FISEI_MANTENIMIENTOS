@@ -5,7 +5,6 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { HojaVidaPage } from './pages/admin/HojaVidaPage';
 import { LabPage } from './pages/lab/LabPage';
-import RegistrarEquipoPage from './pages/inventario/RegistrarEquipoPage';
 import './App.css';
 
 function App() {
@@ -24,19 +23,9 @@ function App() {
               <LabPage />
             </ProtectedRoute>
           } />
-          <Route path="/lab/registrar-equipo" element={
-            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
-              <RegistrarEquipoPage />
-            </ProtectedRoute>
-          } />
           <Route path="/lab/inventario/:id/hoja-vida" element={
             <ProtectedRoute rolesPermitidos={['Laboratorista']}>
               <HojaVidaPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/registrar-equipo" element={
-            <ProtectedRoute rolesPermitidos={['Administrador']}>
-              <RegistrarEquipoPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/inventario/:id/hoja-vida" element={

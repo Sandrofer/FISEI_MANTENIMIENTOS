@@ -75,4 +75,27 @@ public class UsuariosController : ControllerBase
 
         return Ok(new { mensaje = "Rol actualizado correctamente" });
     }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ActualizarUsuario(int id, [FromBody] ActualizarUsuarioDto dto)
+    {
+        var usuario = await _context.Usuarios.FindAsync(id);
+        if (usuario == null) return NotFound(new { mensaje = "Usuario no encontrado" });
+
+        // Verificar si el correo ya existe en otro usuario
+        if (dto.Correo != usuario.Correo && await _context.Usuarios.AnyAsync(u => u.Correo == dto.Correo))
+            return BadRequest(new { mensaje = "El correo ya está registrado" });
+
+        usuario.Nombre = dto.Nombre;
+        usuario.Apellido = dto.Apellido;
+        usuario.Correo = dto.Correo;
+        usuario.Rol = dto.Rol;
+        usuario.Activo = dto.Activo;
+
+        _context.Usuarios.Update(usuario);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { mensaje = "Usuario actualizado correctamente" });
+    }
 }

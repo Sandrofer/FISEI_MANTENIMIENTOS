@@ -26,3 +26,15 @@ export const actualizarRol = async (id: number, rol: string) => {
   const res = await axios.put(`${API_URL}/usuarios/${id}/rol`, { rol }, getHeaders());
   return res.data;
 };
+
+export const actualizarUsuario = async (id: number, datos: {
+  nombre: string;
+  apellido: string;
+  correo: string;
+  rol: string;
+  activo: boolean;
+  password?: string;
+}) => {
+  const res = await axios.put(`${API_URL}/usuarios/${id}`, datos, getHeaders());
+  return res.data;
+};

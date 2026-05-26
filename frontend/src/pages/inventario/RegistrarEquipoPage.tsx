@@ -41,7 +41,7 @@ export default function RegistrarEquipoPage() {
   };
 
   return (
-    <main className="register-shell">
+    <div className="register-shell">
       <div className="register-container">
         <section className="section-header">
           <div>
@@ -165,6 +165,6 @@ export default function RegistrarEquipoPage() {
           )}
         </section>
       </div>
-    </main>
+    </div>
   );
 }
