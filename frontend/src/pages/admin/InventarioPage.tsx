@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { obtenerEquipos } from '../../services/inventarioService';
-import type { Equipo } from '../../services/inventarioService';
+import type { Equipo, FiltrosEquipo } from '../../services/inventarioService';
 
 interface InventarioPageProps {
   basePath?: '/admin' | '/lab';
@@ -14,23 +14,47 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const cargarEquipos = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await obtenerEquipos();
-        setEquipos(data);
-      } catch (err) {
-        const axiosError = err as AxiosError;
-        setError(axiosError.response ? 'No se pudo cargar el inventario.' : 'No hay conexion con el servicio de inventario.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Estados de filtros
+  const [estado, setEstado] = useState('');
+  const [procesador, setProcesador] = useState('');
+  const [fechaDesde, setFechaDesde] = useState('');
+  const [fechaHasta, setFechaHasta] = useState('');
 
+  const cargarEquipos = async (filtros?: FiltrosEquipo) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await obtenerEquipos(filtros);
+      setEquipos(data);
+    } catch (err) {
+      const axiosError = err as AxiosError;
+      setError(axiosError.response ? 'No se pudo cargar el inventario.' : 'No hay conexion con el servicio de inventario.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     cargarEquipos();
   }, []);
+
+  const handleBuscar = (e: React.FormEvent) => {
+    e.preventDefault();
+    const filtros: FiltrosEquipo = {};
+    if (estado) filtros.estado = estado;
+    if (procesador) filtros.procesador = procesador;
+    if (fechaDesde) filtros.fechaDesde = fechaDesde;
+    if (fechaHasta) filtros.fechaHasta = fechaHasta;
+    cargarEquipos(filtros);
+  };
+
+  const handleLimpiar = () => {
+    setEstado('');
+    setProcesador('');
+    setFechaDesde('');
+    setFechaHasta('');
+    cargarEquipos();
+  };
 
   if (loading) {
     return <div className="state-box card">Cargando inventario...</div>;
@@ -53,6 +77,76 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
         </button>
       </div>
 
+      {/* Barra de Filtros de Búsqueda Avanzada */}
+      <div className="card card--padded mb-20">
+        <form onSubmit={handleBuscar} className="form-grid">
+          <div className="form-field">
+            <label className="form-label" htmlFor="estado-filter">Estado</label>
+            <select
+              id="estado-filter"
+              className="form-select"
+              value={estado}
+              onChange={(e) => setEstado(e.target.value)}
+            >
+              <option value="">Todos</option>
+              <option value="Activo">Activo</option>
+              <option value="En mantenimiento">En mantenimiento</option>
+              <option value="Dado de baja">Dado de baja</option>
+            </select>
+          </div>
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="procesador-filter">Procesador</label>
+            <select
+              id="procesador-filter"
+              className="form-select"
+              value={procesador}
+              onChange={(e) => setProcesador(e.target.value)}
+            >
+              <option value="">Todos</option>
+              <option value="Intel Core i3">Intel Core i3</option>
+              <option value="Intel Core i5">Intel Core i5</option>
+              <option value="Intel Core i7">Intel Core i7</option>
+              <option value="Intel Core i9">Intel Core i9</option>
+              <option value="AMD Ryzen 5">AMD Ryzen 5</option>
+              <option value="AMD Ryzen 7">AMD Ryzen 7</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="fecha-desde-filter">Comprado desde</label>
+            <input
+              id="fecha-desde-filter"
+              type="date"
+              className="form-input"
+              value={fechaDesde}
+              onChange={(e) => setFechaDesde(e.target.value)}
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="fecha-hasta-filter">Comprado hasta</label>
+            <input
+              id="fecha-hasta-filter"
+              type="date"
+              className="form-input"
+              value={fechaHasta}
+              onChange={(e) => setFechaHasta(e.target.value)}
+            />
+          </div>
+
+          <div className="form-field form-field--full form-actions" style={{ marginTop: '8px' }}>
+            <button type="button" onClick={handleLimpiar} className="btn btn--outline">
+              Limpiar filtros
+            </button>
+            <button type="submit" className="btn btn--primary">
+              Buscar
+            </button>
+          </div>
+        </form>
+      </div>
+
       <div className="table-card">
         <div className="table-responsive">
           <table className="data-table">
@@ -69,7 +163,7 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
               {equipos.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="state-box">
-                    No hay equipos registrados.
+                    No se encontraron equipos con los filtros seleccionados.
                   </td>
                 </tr>
               ) : (
@@ -84,7 +178,11 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
                     </td>
                     <td>{equipo.laboratorio}</td>
                     <td>
-                      <span className="badge badge--success">{equipo.estado}</span>
+                      <span className={`badge ${
+                        equipo.estado === 'Activo' ? 'badge--success' :
+                        equipo.estado === 'En mantenimiento' ? 'badge--primary' :
+                        'badge--neutral'
+                      }`}>{equipo.estado}</span>
                     </td>
                     <td className="data-table__right">
                       <button

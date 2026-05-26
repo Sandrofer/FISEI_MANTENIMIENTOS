@@ -34,9 +34,13 @@ public class InventarioController : ControllerBase
     }
 
     [HttpGet("equipos")]
-    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos()
+    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos(
+        [FromQuery] string? estado,
+        [FromQuery] string? procesador,
+        [FromQuery] DateOnly? fechaDesde,
+        [FromQuery] DateOnly? fechaHasta)
     {
-        var equipos = await _service.ObtenerEquiposAsync();
+        var equipos = await _service.ObtenerEquiposAsync(estado, procesador, fechaDesde, fechaHasta);
         return Ok(equipos);
     }
 

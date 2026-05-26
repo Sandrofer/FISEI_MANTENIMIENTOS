@@ -1,3 +1,4 @@
+using FISEI.Maintenance.API.Data;
 using Inventory.API.Data;
 using Inventory.API.DTOs;
 using Inventory.API.Models;
@@ -8,10 +9,12 @@ namespace Inventory.API.Services;
 public class InventarioService
 {
     private readonly InventoryDbContext _context;
+    private readonly MaintenanceDbContext _maintenanceContext;
 
-    public InventarioService(InventoryDbContext context)
+    public InventarioService(InventoryDbContext context, MaintenanceDbContext maintenanceContext)
     {
         _context = context;
+        _maintenanceContext = maintenanceContext;
     }
 
     public async Task<EquipoResponseDto> RegistrarEquipoAsync(CrearEquipoDto dto)
@@ -85,10 +88,35 @@ public class InventarioService
         };
     }
 
-    public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync()
+    public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync(
+        string? estado = null,
+        string? procesador = null,
+        DateOnly? fechaDesde = null,
+        DateOnly? fechaHasta = null)
     {
-        return await _context.Equipos
-            .AsNoTracking()
+        var query = _context.Equipos.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(estado))
+        {
+            query = query.Where(e => e.Estado == estado);
+        }
+
+        if (!string.IsNullOrWhiteSpace(procesador))
+        {
+            query = query.Where(e => e.Procesador.Contains(procesador));
+        }
+
+        if (fechaDesde.HasValue)
+        {
+            query = query.Where(e => e.FechaCompra >= fechaDesde.Value);
+        }
+
+        if (fechaHasta.HasValue)
+        {
+            query = query.Where(e => e.FechaCompra <= fechaHasta.Value);
+        }
+
+        return await query
             .OrderByDescending(e => e.FechaRegistro)
             .Select(e => new EquipoResponseDto
             {
@@ -131,7 +159,7 @@ public class InventarioService
             return null;
         }
 
-        var mantenimientos = await _context.Mantenimientos
+        var mantenimientos = await _maintenanceContext.Mantenimientos
             .AsNoTracking()
             .Where(m => m.EquipoId == id)
             .OrderByDescending(m => m.FechaProgramada)
@@ -139,8 +167,14 @@ public class InventarioService
             {
                 Id = m.Id,
                 FechaProgramada = m.FechaProgramada,
+                FechaRealizada = m.FechaRealizada,
                 Estado = m.Estado,
-                Observaciones = m.Observaciones
+                Tipo = m.Tipo,
+                Responsable = m.Responsable,
+                Prioridad = m.Prioridad,
+                Observaciones = m.Observaciones,
+                Diagnostico = m.Diagnostico,
+                AccionesRealizadas = m.AccionesRealizadas
             })
             .ToListAsync();
 

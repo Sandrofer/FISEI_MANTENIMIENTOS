@@ -21,8 +21,14 @@ export interface MantenimientoResponse {
 export interface Mantenimiento {
   id: number;
   fechaProgramada: string;
+  fechaRealizada: string | null;
   estado: string;
+  tipo: string | null;
+  responsable: string | null;
+  prioridad: string | null;
   observaciones: string | null;
+  diagnostico: string | null;
+  accionesRealizadas: string | null;
 }
 
 export interface EquipoResponse {
@@ -60,8 +66,15 @@ export const registrarEquipo = async (dto: CrearEquipoDto): Promise<EquipoRespon
   return response.data;
 };
 
-export const obtenerEquipos = async (): Promise<Equipo[]> => {
-  const response = await axios.get<Equipo[]>(`${BASE_URL}/equipos`);
+export interface FiltrosEquipo {
+  estado?: string;
+  procesador?: string;
+  fechaDesde?: string;
+  fechaHasta?: string;
+}
+
+export const obtenerEquipos = async (filtros?: FiltrosEquipo): Promise<Equipo[]> => {
+  const response = await axios.get<Equipo[]>(`${BASE_URL}/equipos`, { params: filtros });
   return response.data;
 };
 
