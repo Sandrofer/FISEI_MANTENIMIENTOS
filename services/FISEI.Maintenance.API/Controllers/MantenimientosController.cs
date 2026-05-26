@@ -66,6 +66,15 @@ public class MantenimientosController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador,Laboratorista,TÃ©cnico,Tecnico")]
+    public async Task<IActionResult> Actualizar(int id, ActualizarMantenimientoDto dto)
+    {
+        var success = await _service.ActualizarMantenimientoAsync(id, dto);
+        if (!success) return NotFound(new { mensaje = "Mantenimiento no encontrado" });
+        return NoContent();
+    }
+
     [HttpPut("{id}/iniciar")]
     [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> Iniciar(int id)

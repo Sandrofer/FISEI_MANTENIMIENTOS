@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
-import { obtenerEquipos } from '../../services/inventarioService';
-import type { Equipo, FiltrosEquipo } from '../../services/inventarioService';
+import { actualizarEquipo, eliminarEquipo, obtenerEquipos } from '../../services/inventarioService';
+import type { ActualizarEquipoDto, Equipo, FiltrosEquipo } from '../../services/inventarioService';
 
 interface InventarioPageProps {
   basePath?: '/admin' | '/lab';
@@ -12,7 +12,19 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
   const navigate = useNavigate();
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [equipoEditando, setEquipoEditando] = useState<Equipo | null>(null);
+  const [formEdicion, setFormEdicion] = useState<ActualizarEquipoDto>({
+    numeroSerie: '',
+    marca: '',
+    modelo: '',
+    procesador: '',
+    laboratorio: '',
+    fechaCompra: '',
+    estado: 'Activo'
+  });
 
   // Estados de filtros
   const [estado, setEstado] = useState('');
@@ -24,6 +36,7 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
     try {
       setLoading(true);
       setError(null);
+      setMensaje(null);
       const data = await obtenerEquipos(filtros);
       setEquipos(data);
     } catch (err) {
@@ -56,12 +69,72 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
     cargarEquipos();
   };
 
+  const abrirEdicion = (equipo: Equipo) => {
+    setError(null);
+    setMensaje(null);
+    setEquipoEditando(equipo);
+    setFormEdicion({
+      numeroSerie: equipo.numeroSerie,
+      marca: equipo.marca,
+      modelo: equipo.modelo,
+      procesador: equipo.procesador,
+      laboratorio: equipo.laboratorio,
+      fechaCompra: equipo.fechaCompra,
+      estado: equipo.estado
+    });
+  };
+
+  const cerrarEdicion = () => {
+    setEquipoEditando(null);
+    setError(null);
+  };
+
+  const handleEditarChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormEdicion({ ...formEdicion, [e.target.name]: e.target.value });
+  };
+
+  const handleGuardarEdicion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!equipoEditando) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+      setMensaje(null);
+      const actualizado = await actualizarEquipo(equipoEditando.id, formEdicion);
+      setEquipos((prev) => prev.map((equipo) => equipo.id === actualizado.id ? actualizado : equipo));
+      setEquipoEditando(null);
+      setMensaje('Equipo actualizado correctamente.');
+    } catch (err: any) {
+      const detalle = err.response?.data?.mensaje || err.response?.data?.detalle || err.message;
+      setError(`No se pudo actualizar el equipo. ${detalle ?? ''}`.trim());
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEliminar = async (equipo: Equipo) => {
+    const confirmado = window.confirm(`Desea eliminar el equipo ${equipo.numeroSerie}?`);
+    if (!confirmado) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+      setMensaje(null);
+      await eliminarEquipo(equipo.id);
+      setEquipos((prev) => prev.filter((item) => item.id !== equipo.id));
+      if (equipoEditando?.id === equipo.id) setEquipoEditando(null);
+      setMensaje('Equipo eliminado correctamente.');
+    } catch (err: any) {
+      const detalle = err.response?.data?.mensaje || err.response?.data?.detalle || err.message;
+      setError(`No se pudo eliminar el equipo. ${detalle ?? ''}`.trim());
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return <div className="state-box card">Cargando inventario...</div>;
-  }
-
-  if (error) {
-    return <div className="alert alert--error">{error}</div>;
   }
 
   return (
@@ -78,6 +151,139 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
       </div>
 
       {/* Barra de Filtros de Búsqueda Avanzada */}
+      {mensaje && (
+        <div className="alert alert--success mb-20">
+          {mensaje}
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert--error mb-20">
+          {error}
+        </div>
+      )}
+
+      {equipoEditando && (
+        <div className="card card--padded mb-20">
+          <div className="section-header">
+            <div>
+              <p className="section-kicker">Gestion de equipo</p>
+              <h3 className="section-title">Editar {equipoEditando.numeroSerie}</h3>
+              <p className="section-description">Actualice los datos del activo seleccionado.</p>
+            </div>
+            <button type="button" onClick={cerrarEdicion} className="btn btn--outline">
+              Cancelar
+            </button>
+          </div>
+
+          <form onSubmit={handleGuardarEdicion} className="form-grid">
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-numeroSerie">Numero de Serie</label>
+              <input
+                id="edit-numeroSerie"
+                name="numeroSerie"
+                value={formEdicion.numeroSerie}
+                onChange={handleEditarChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-marca">Marca</label>
+              <input
+                id="edit-marca"
+                name="marca"
+                value={formEdicion.marca}
+                onChange={handleEditarChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-modelo">Modelo</label>
+              <input
+                id="edit-modelo"
+                name="modelo"
+                value={formEdicion.modelo}
+                onChange={handleEditarChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-procesador">Procesador</label>
+              <input
+                id="edit-procesador"
+                name="procesador"
+                value={formEdicion.procesador}
+                onChange={handleEditarChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-laboratorio">Laboratorio</label>
+              <select
+                id="edit-laboratorio"
+                name="laboratorio"
+                value={formEdicion.laboratorio}
+                onChange={handleEditarChange}
+                className="form-select"
+                required
+              >
+                <option value="">Seleccione un laboratorio</option>
+                <option value="Laboratorio 1">Laboratorio 1</option>
+                <option value="Laboratorio 2">Laboratorio 2</option>
+                <option value="Laboratorio 3">Laboratorio 3</option>
+                <option value="Laboratorio 4">Laboratorio 4</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-estado">Estado</label>
+              <select
+                id="edit-estado"
+                name="estado"
+                value={formEdicion.estado}
+                onChange={handleEditarChange}
+                className="form-select"
+                required
+              >
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="En reparación">En reparación</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="edit-fechaCompra">Fecha de Compra</label>
+              <input
+                id="edit-fechaCompra"
+                name="fechaCompra"
+                type="date"
+                value={formEdicion.fechaCompra}
+                onChange={handleEditarChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div className="form-actions form-field--full">
+              <button type="button" onClick={cerrarEdicion} className="btn btn--outline">
+                Cancelar
+              </button>
+              <button type="submit" disabled={saving} className="btn btn--primary">
+                {saving ? 'Guardando...' : 'Guardar cambios'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       <div className="card card--padded mb-20">
         <form onSubmit={handleBuscar} className="form-grid">
           <div className="form-field">
@@ -89,9 +295,9 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
               onChange={(e) => setEstado(e.target.value)}
             >
               <option value="">Todos</option>
-              <option value="Operativo">Operativo</option>
-              <option value="En mantenimiento">En mantenimiento</option>
-              <option value="Dado de baja">Dado de baja</option>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+              <option value="En reparación">En reparación</option>
             </select>
           </div>
 
@@ -179,8 +385,8 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
                     <td>{equipo.laboratorio}</td>
                     <td>
                       <span className={`badge ${
-                        equipo.estado === 'Operativo' ? 'badge--success' :
-                        equipo.estado === 'En mantenimiento' ? 'badge--primary' :
+                        equipo.estado === 'Activo' ? 'badge--success' :
+                        equipo.estado === 'En reparación' ? 'badge--primary' :
                         'badge--neutral'
                       }`}>{equipo.estado}</span>
                     </td>
@@ -190,6 +396,23 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
                         className="btn btn--outline btn--sm"
                       >
                         Ver hoja de vida
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => abrirEdicion(equipo)}
+                        className="btn btn--outline btn--sm"
+                        style={{ marginLeft: '8px' }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleEliminar(equipo)}
+                        disabled={saving}
+                        className="btn btn--outline btn--sm"
+                        style={{ marginLeft: '8px' }}
+                      >
+                        Eliminar
                       </button>
                     </td>
                   </tr>

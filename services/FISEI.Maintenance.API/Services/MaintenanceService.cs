@@ -105,6 +105,22 @@ public class MaintenanceService
         return true;
     }
 
+    public async Task<bool> ActualizarMantenimientoAsync(int id, ActualizarMantenimientoDto dto)
+    {
+        var m = await _context.Mantenimientos.FindAsync(id);
+        if (m == null) return false;
+
+        m.Tipo = dto.Tipo;
+        m.Responsable = dto.Responsable;
+        m.Prioridad = dto.Prioridad;
+        m.FechaProgramada = dto.FechaProgramada;
+        m.Observaciones = dto.Observaciones;
+        m.FechaActualizacion = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<bool> IniciarMantenimientoAsync(int id)
     {
         var m = await _context.Mantenimientos.FindAsync(id);

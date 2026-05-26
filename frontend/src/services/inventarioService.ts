@@ -11,6 +11,10 @@ export interface CrearEquipoDto {
   fechaCompra: string;
 }
 
+export interface ActualizarEquipoDto extends CrearEquipoDto {
+  estado: string;
+}
+
 export interface MantenimientoResponse {
   id: number;
   fechaProgramada: string;
@@ -80,4 +84,13 @@ export const obtenerEquipos = async (filtros?: FiltrosEquipo): Promise<Equipo[]>
 export const getHojaVidaEquipo = async (id: number): Promise<HojaVida> => {
   const response = await axios.get<HojaVida>(`${BASE_URL}/equipos/${id}/hoja-vida`);
   return response.data;
+};
+
+export const actualizarEquipo = async (id: number, dto: ActualizarEquipoDto): Promise<Equipo> => {
+  const response = await axios.put<Equipo>(`${BASE_URL}/equipos/${id}`, dto);
+  return response.data;
+};
+
+export const eliminarEquipo = async (id: number): Promise<void> => {
+  await axios.delete(`${BASE_URL}/equipos/${id}`);
 };

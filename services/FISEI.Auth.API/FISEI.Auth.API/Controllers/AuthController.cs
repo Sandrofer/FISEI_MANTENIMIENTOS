@@ -23,9 +23,15 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         var usuario = await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Correo == dto.Correo && u.Activo);
+            .FirstOrDefaultAsync(u => u.Correo == dto.Correo);
 
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
+        if (usuario == null)
+            return Unauthorized(new { mensaje = "Credenciales incorrectas" });
+
+        if (!usuario.Activo)
+            return Unauthorized(new { mensaje = "Cuenta suspendida. Contacte al administrador." });
+
+        if (!BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
             return Unauthorized(new { mensaje = "Credenciales incorrectas" });
 
         var token = _tokenService.GenerarToken(usuario);

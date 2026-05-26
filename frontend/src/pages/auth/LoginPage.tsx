@@ -25,8 +25,12 @@ export const LoginPage = () => {
       guardarSesion(data);
       if (data.rol === 'Administrador') navigate('/admin');
       else navigate('/lab');
-    } catch {
-      setError('Credenciales incorrectas');
+    } catch (err: any) {
+      if (err.response?.data?.mensaje) {
+        setError(err.response.data.mensaje);
+      } else {
+        setError('Credenciales incorrectas');
+      }
     } finally {
       setCargando(false);
     }

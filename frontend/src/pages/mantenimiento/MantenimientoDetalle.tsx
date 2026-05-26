@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { obtenerMantenimientoPorId, type MantenimientoDto } from '../../services/mantenimientoService';
+import {
+  actualizarMantenimiento,
+  obtenerMantenimientoPorId,
+  type ActualizarMantenimientoDto,
+  type MantenimientoDto
+} from '../../services/mantenimientoService';
+import { getUsuarios } from '../../services/usuarioService';
 
 interface MantenimientoDetalleProps {
   mantenimientoId: number;
@@ -9,7 +15,19 @@ interface MantenimientoDetalleProps {
 export const MantenimientoDetalle = ({ mantenimientoId, onVolver }: MantenimientoDetalleProps) => {
   const [mantenimiento, setMantenimiento] = useState<MantenimientoDto | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editando, setEditando] = useState(false);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [loadingUsuarios, setLoadingUsuarios] = useState(false);
+  const [formData, setFormData] = useState<ActualizarMantenimientoDto>({
+    tipo: '',
+    responsable: '',
+    prioridad: '',
+    fechaProgramada: '',
+    observaciones: ''
+  });
 
   useEffect(() => {
     const fetchDetalle = async () => {
@@ -17,6 +35,13 @@ export const MantenimientoDetalle = ({ mantenimientoId, onVolver }: Mantenimient
         setLoading(true);
         const data = await obtenerMantenimientoPorId(mantenimientoId);
         setMantenimiento(data);
+        setFormData({
+          tipo: data.tipo ?? 'Preventivo',
+          responsable: data.responsable ?? '',
+          prioridad: data.prioridad ?? 'Media',
+          fechaProgramada: data.fechaProgramada,
+          observaciones: data.observaciones ?? ''
+        });
       } catch (err) {
         console.error(err);
         setError('No se pudo cargar el detalle del mantenimiento.');
@@ -26,6 +51,62 @@ export const MantenimientoDetalle = ({ mantenimientoId, onVolver }: Mantenimient
     };
     fetchDetalle();
   }, [mantenimientoId]);
+
+  useEffect(() => {
+    const cargarUsuarios = async () => {
+      try {
+        setLoadingUsuarios(true);
+        const response = await getUsuarios(1, 100);
+        const laboratoristas = response.datos?.filter((u: any) => u.rol === 'Laboratorista') || [];
+        setUsuarios(laboratoristas);
+      } catch (err) {
+        console.error('Error al cargar responsables', err);
+      } finally {
+        setLoadingUsuarios(false);
+      }
+    };
+
+    cargarUsuarios();
+  }, []);
+
+  const handleGuardarEdicion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mantenimiento) return;
+
+    try {
+      setSaving(true);
+      setEditError(null);
+      await actualizarMantenimiento(mantenimiento.id, {
+        ...formData,
+        observaciones: formData.observaciones?.trim() || undefined
+      });
+
+      const actualizado = await obtenerMantenimientoPorId(mantenimiento.id);
+      setMantenimiento(actualizado);
+      setFormData({
+        tipo: actualizado.tipo ?? 'Preventivo',
+        responsable: actualizado.responsable ?? '',
+        prioridad: actualizado.prioridad ?? 'Media',
+        fechaProgramada: actualizado.fechaProgramada,
+        observaciones: actualizado.observaciones ?? ''
+      });
+      setEditando(false);
+    } catch (err) {
+      console.error(err);
+      const axiosError = err as any;
+      const detalle = axiosError.response?.data?.mensaje
+        || axiosError.response?.data?.title
+        || axiosError.response?.data?.detalle
+        || axiosError.message;
+      setEditError(`No se pudo guardar la edicion del mantenimiento. ${detalle ?? ''}`.trim());
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const responsableActualExiste = usuarios.some(
+    (u) => `${u.nombre} ${u.apellido}` === formData.responsable
+  );
 
   if (loading) {
     return (
@@ -79,13 +160,9 @@ export const MantenimientoDetalle = ({ mantenimientoId, onVolver }: Mantenimient
         </button>
 
         <div className="flex items-center gap-3">
-          <button onClick={() => alert('Función de edición en desarrollo')} className="px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center gap-2 transition-all">
+          <button onClick={() => setEditando(true)} className="px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center gap-2 transition-all">
             <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
             Editar
-          </button>
-          <button onClick={() => alert('Función de cambio de estado en desarrollo')} className="px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center gap-2 transition-all">
-            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-            Cambiar Estado
           </button>
           <button onClick={() => alert('Función de reporte en desarrollo')} className="px-4 py-2 bg-primary text-white rounded-lg shadow-md hover:bg-primary/90 font-medium text-sm flex items-center gap-2 transition-all">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
@@ -93,6 +170,118 @@ export const MantenimientoDetalle = ({ mantenimientoId, onVolver }: Mantenimient
           </button>
         </div>
       </div>
+
+      {editando && (
+        <form onSubmit={handleGuardarEdicion} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="text-lg font-bold text-slate-800">Editar mantenimiento</h3>
+              <p className="text-sm text-slate-500">Actualiza los datos principales de la orden MT-{mantenimiento.id.toString().padStart(4, '0')}.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditando(false)}
+              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 font-medium text-sm"
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {editError && (
+            <div className="mb-5 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
+              {editError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-800">Tipo</label>
+              <select
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                value={formData.tipo}
+                onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                required
+              >
+                <option value="Preventivo">Preventivo</option>
+                <option value="Correctivo">Correctivo</option>
+                <option value="Adaptativo">Adaptativo</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-800">Prioridad</label>
+              <select
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                value={formData.prioridad}
+                onChange={(e) => setFormData({ ...formData, prioridad: e.target.value })}
+                required
+              >
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+                <option value="Urgente">Urgente</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-800">Responsable</label>
+              <select
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                value={formData.responsable}
+                onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
+                required
+              >
+                <option value="" disabled>
+                  {loadingUsuarios ? 'Cargando responsables...' : 'Seleccione un responsable'}
+                </option>
+                {formData.responsable && !responsableActualExiste && (
+                  <option value={formData.responsable}>{formData.responsable}</option>
+                )}
+                {usuarios.map((usuario) => {
+                  const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`;
+                  return (
+                    <option key={usuario.id} value={nombreCompleto}>
+                      {nombreCompleto}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-800">Fecha programada</label>
+              <input
+                type="date"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                value={formData.fechaProgramada}
+                onChange={(e) => setFormData({ ...formData, fechaProgramada: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-800">Observaciones</label>
+              <textarea
+                rows={3}
+                maxLength={500}
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                value={formData.observaciones ?? ''}
+                onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-6">
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md shadow-blue-600/20 transition-all disabled:opacity-50"
+            >
+              {saving ? 'Guardando...' : 'Guardar cambios'}
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* HEADER DASHBOARD CARD */}
       <div className="bg-white rounded-t-2xl shadow-sm border border-slate-200 border-b-0 overflow-hidden">

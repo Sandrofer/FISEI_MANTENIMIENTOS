@@ -37,6 +37,14 @@ export interface CrearMantenimientoDto {
   fechaProgramada?: string;
 }
 
+export interface ActualizarMantenimientoDto {
+  tipo: string;
+  responsable: string;
+  prioridad: string;
+  fechaProgramada: string;
+  observaciones?: string;
+}
+
 export interface CompletarMantenimientoDto {
   fechaRealizada: string;
   diagnostico: string;
@@ -71,6 +79,10 @@ export const obtenerMantenimientoPorId = async (id: number): Promise<Mantenimien
 export const crearMantenimiento = async (dto: CrearMantenimientoDto): Promise<MantenimientoDto> => {
   const res = await axios.post(API_URL, dto, getHeaders());
   return res.data;
+};
+
+export const actualizarMantenimiento = async (id: number, dto: ActualizarMantenimientoDto): Promise<void> => {
+  await axios.put(`${API_URL}/${id}`, dto, getHeaders());
 };
 
 export const reprogramarMantenimiento = async (id: number, dto: ReprogramarMantenimientoDto): Promise<void> => {

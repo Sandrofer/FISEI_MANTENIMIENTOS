@@ -56,15 +56,23 @@ public class InventarioController : ControllerBase
 
         return Ok(hojaVida);
     }
-        [HttpPut("equipos/{id:int}")]
+    [HttpPut("equipos/{id:int}")]
     public async Task<IActionResult> ActualizarEquipo(int id, [FromBody] ActualizarEquipoDto dto)
     {
-        var resultado = await _service.ActualizarEquipoAsync(id, dto);
+        try
+        {
+            var resultado = await _service.ActualizarEquipoAsync(id, dto);
 
-        if (resultado == null)
-            return NotFound(new { mensaje = "Equipo no encontrado" });
+            if (resultado == null)
+                return NotFound(new { mensaje = "Equipo no encontrado" });
 
-        return Ok(resultado);
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+            return StatusCode(500, new { mensaje = errorMsg });
+        }
     }
 
     [HttpDelete("equipos/{id:int}")]
