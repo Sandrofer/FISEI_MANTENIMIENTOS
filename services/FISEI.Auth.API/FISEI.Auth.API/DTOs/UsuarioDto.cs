@@ -31,4 +31,5 @@ public class ActualizarUsuarioDto
     public string Correo { get; set; } = string.Empty;
     public string Rol { get; set; } = string.Empty;
     public bool Activo { get; set; }
+    public string PasswordConfirmacion { get; set; } = string.Empty;
 }

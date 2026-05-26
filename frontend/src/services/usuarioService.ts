@@ -33,7 +33,7 @@ export const actualizarUsuario = async (id: number, datos: {
   correo: string;
   rol: string;
   activo: boolean;
-  password?: string;
+  passwordConfirmacion: string;
 }) => {
   const res = await axios.put(`${API_URL}/usuarios/${id}`, datos, getHeaders());
   return res.data;

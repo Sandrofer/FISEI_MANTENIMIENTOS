@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using FISEI.Auth.API.Data;
 using FISEI.Auth.API.DTOs;
 using FISEI.Auth.API.Models;
@@ -11,6 +12,7 @@ namespace FISEI.Auth.API.Controllers;
 [Route("api/usuarios")]
 public class UsuariosController : ControllerBase
 {
+    private const string DominioInstitucional = "@uta.edu.ec";
     private readonly AuthDbContext _context;
 
     public UsuariosController(AuthDbContext context)
@@ -44,14 +46,19 @@ public class UsuariosController : ControllerBase
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CrearUsuario([FromBody] CrearUsuarioDto dto)
     {
-        if (await _context.Usuarios.AnyAsync(u => u.Correo == dto.Correo))
-            return BadRequest(new { mensaje = "El correo ya está registrado" });
+        var correoNormalizado = dto.Correo.Trim().ToLowerInvariant();
+
+        if (!correoNormalizado.EndsWith(DominioInstitucional))
+            return BadRequest(new { mensaje = "El correo debe ser institucional (@uta.edu.ec)" });
+
+        if (await _context.Usuarios.AnyAsync(u => u.Correo.ToLower() == correoNormalizado))
+            return BadRequest(new { mensaje = "El correo ya esta registrado" });
 
         var usuario = new Usuario
         {
-            Nombre = dto.Nombre,
-            Apellido = dto.Apellido,
-            Correo = dto.Correo,
+            Nombre = dto.Nombre.Trim(),
+            Apellido = dto.Apellido.Trim(),
+            Correo = correoNormalizado,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             Rol = dto.Rol
         };
@@ -83,13 +90,29 @@ public class UsuariosController : ControllerBase
         var usuario = await _context.Usuarios.FindAsync(id);
         if (usuario == null) return NotFound(new { mensaje = "Usuario no encontrado" });
 
-        // Verificar si el correo ya existe en otro usuario
-        if (dto.Correo != usuario.Correo && await _context.Usuarios.AnyAsync(u => u.Correo == dto.Correo))
-            return BadRequest(new { mensaje = "El correo ya está registrado" });
+        var adminId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(adminId, out var adminIdNumerico))
+            return Unauthorized(new { mensaje = "Sesion invalida" });
 
-        usuario.Nombre = dto.Nombre;
-        usuario.Apellido = dto.Apellido;
-        usuario.Correo = dto.Correo;
+        var admin = await _context.Usuarios.FindAsync(adminIdNumerico);
+        if (admin == null || !admin.Activo)
+            return Unauthorized(new { mensaje = "Administrador no encontrado o inactivo" });
+
+        if (string.IsNullOrWhiteSpace(dto.PasswordConfirmacion) ||
+            !BCrypt.Net.BCrypt.Verify(dto.PasswordConfirmacion, admin.PasswordHash))
+            return Unauthorized(new { mensaje = "La contrasena de confirmacion es incorrecta" });
+
+        var correoNormalizado = dto.Correo.Trim().ToLowerInvariant();
+
+        if (!correoNormalizado.EndsWith(DominioInstitucional))
+            return BadRequest(new { mensaje = "El correo debe ser institucional (@uta.edu.ec)" });
+
+        if (await _context.Usuarios.AnyAsync(u => u.Id != id && u.Correo.ToLower() == correoNormalizado))
+            return BadRequest(new { mensaje = "El correo ya esta registrado" });
+
+        usuario.Nombre = dto.Nombre.Trim();
+        usuario.Apellido = dto.Apellido.Trim();
+        usuario.Correo = correoNormalizado;
         usuario.Rol = dto.Rol;
         usuario.Activo = dto.Activo;
 
