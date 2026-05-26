@@ -56,4 +56,26 @@ public class InventarioController : ControllerBase
 
         return Ok(hojaVida);
     }
+        [HttpPut("equipos/{id:int}")]
+    public async Task<IActionResult> ActualizarEquipo(int id, [FromBody] ActualizarEquipoDto dto)
+    {
+        var resultado = await _service.ActualizarEquipoAsync(id, dto);
+
+        if (resultado == null)
+            return NotFound(new { mensaje = "Equipo no encontrado" });
+
+        return Ok(resultado);
+    }
+
+    [HttpDelete("equipos/{id:int}")]
+    public async Task<IActionResult> EliminarEquipo(int id)
+    {
+        var eliminado = await _service.EliminarEquipoAsync(id);
+
+        if (!eliminado)
+            return NotFound(new { mensaje = "Equipo no encontrado" });
+
+        return Ok(new { mensaje = "Equipo eliminado correctamente" });
+    }
+    
 }

@@ -170,4 +170,61 @@ public class MaintenanceService
             }
         };
     }
+        // ========== MÉTODOS NUEVOS PARA US-MANT-02 ==========
+
+    // Obtener categorías de falla (para combobox)
+    public async Task<List<CatFallaDto>> ObtenerCategoriasFallaAsync()
+    {
+        return await _context.CatFallas
+            .AsNoTracking()
+            .Select(f => new CatFallaDto
+            {
+                Id = f.Id,
+                Categoria = f.Categoria,
+                Detalle = f.Detalle
+            })
+            .ToListAsync();
+    }
+
+    // Obtener actividades predefinidas (para checkboxes)
+    public async Task<List<CatActividadDto>> ObtenerActividadesAsync()
+    {
+        return await _context.CatActividades
+            .AsNoTracking()
+            .Select(a => new CatActividadDto
+            {
+                Id = a.Id,
+                Descripcion = a.Descripcion
+            })
+            .ToListAsync();
+    }
+
+    // Registrar diagnóstico y actividades
+    public async Task<bool> RegistrarDiagnosticoAsync(int mantenimientoId, DiagnosticoDto dto)
+    {
+        var mantenimiento = await _context.Mantenimientos
+            .FirstOrDefaultAsync(m => m.Id == mantenimientoId && m.Estado == "Abierto");
+
+        if (mantenimiento == null)
+            return false;
+
+        mantenimiento.Diagnostico = dto.Diagnostico;
+        mantenimiento.Observaciones = dto.Observaciones ?? mantenimiento.Observaciones;
+        mantenimiento.Estado = dto.EstadoFinal ?? "Completado";
+        mantenimiento.FechaRealizada = DateOnly.FromDateTime(DateTime.Now);
+
+        if (dto.ActividadIds != null && dto.ActividadIds.Any())
+        {
+            var relaciones = dto.ActividadIds.Select(actId => new MantenimientoActividad
+            {
+                MantenimientoId = mantenimientoId,
+                ActividadId = actId
+            });
+            _context.MantenimientoActividades.AddRange(relaciones);
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+    
 }

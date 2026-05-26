@@ -30,4 +30,5 @@ public class Mantenimiento
 
     // Relación con Equipo
     public Equipo Equipo { get; set; } = null!;
+    public ICollection<MantenimientoActividad> MantenimientoActividades { get; set; } = new List<MantenimientoActividad>();
 }

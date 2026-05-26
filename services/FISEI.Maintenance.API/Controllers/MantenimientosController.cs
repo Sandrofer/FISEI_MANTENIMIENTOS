@@ -92,4 +92,30 @@ public class MantenimientosController : ControllerBase
         if (!success) return NotFound(new { mensaje = "Mantenimiento no encontrado" });
         return NoContent();
     }
+    // GET: api/mantenimiento/catfallas
+[HttpGet("catfallas")]
+public async Task<IActionResult> ObtenerCategoriasFalla()
+{
+    var categorias = await _service.ObtenerCategoriasFallaAsync();
+    return Ok(categorias);
+}
+
+// GET: api/mantenimiento/actividades
+[HttpGet("actividades")]
+public async Task<IActionResult> ObtenerActividades()
+{
+    var actividades = await _service.ObtenerActividadesAsync();
+    return Ok(actividades);
+}
+
+// PUT: api/mantenimiento/{id}/diagnostico
+[HttpPut("{id:int}/diagnostico")]
+public async Task<IActionResult> RegistrarDiagnostico(int id, [FromBody] DiagnosticoDto dto)
+{
+    var resultado = await _service.RegistrarDiagnosticoAsync(id, dto);
+    if (!resultado)
+        return NotFound(new { mensaje = "Mantenimiento no encontrado o ya fue diagnosticado" });
+    return Ok(new { mensaje = "Diagnóstico registrado correctamente" });
+}
+
 }

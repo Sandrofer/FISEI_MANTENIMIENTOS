@@ -88,51 +88,53 @@ public class InventarioService
         };
     }
 
-    public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync(
-        string? estado = null,
-        string? procesador = null,
-        DateOnly? fechaDesde = null,
-        DateOnly? fechaHasta = null)
+   public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync(
+    string? estado = null,
+    string? procesador = null,
+    DateOnly? fechaDesde = null,
+    DateOnly? fechaHasta = null)
+{
+    var query = _context.Equipos
+        .AsNoTracking()
+        .Where(e => !e.Eliminado);  // ← ✅ ÚNICA LÍNEA NUEVA
+
+    if (!string.IsNullOrWhiteSpace(estado))
     {
-        var query = _context.Equipos.AsNoTracking();
-
-        if (!string.IsNullOrWhiteSpace(estado))
-        {
-            query = query.Where(e => e.Estado == estado);
-        }
-
-        if (!string.IsNullOrWhiteSpace(procesador))
-        {
-            query = query.Where(e => e.Procesador.Contains(procesador));
-        }
-
-        if (fechaDesde.HasValue)
-        {
-            query = query.Where(e => e.FechaCompra >= fechaDesde.Value);
-        }
-
-        if (fechaHasta.HasValue)
-        {
-            query = query.Where(e => e.FechaCompra <= fechaHasta.Value);
-        }
-
-        return await query
-            .OrderByDescending(e => e.FechaRegistro)
-            .Select(e => new EquipoResponseDto
-            {
-                Id = e.Id,
-                NumeroSerie = e.NumeroSerie,
-                Marca = e.Marca,
-                Modelo = e.Modelo,
-                Procesador = e.Procesador,
-                Laboratorio = e.Laboratorio,
-                FechaCompra = e.FechaCompra,
-                Estado = e.Estado,
-                FechaRegistro = e.FechaRegistro,
-                Mantenimientos = new List<MantenimientoResponseDto>()
-            })
-            .ToListAsync();
+        query = query.Where(e => e.Estado == estado);
     }
+
+    if (!string.IsNullOrWhiteSpace(procesador))
+    {
+        query = query.Where(e => e.Procesador.Contains(procesador));
+    }
+
+    if (fechaDesde.HasValue)
+    {
+        query = query.Where(e => e.FechaCompra >= fechaDesde.Value);
+    }
+
+    if (fechaHasta.HasValue)
+    {
+        query = query.Where(e => e.FechaCompra <= fechaHasta.Value);
+    }
+
+    return await query
+        .OrderByDescending(e => e.FechaRegistro)
+        .Select(e => new EquipoResponseDto
+        {
+            Id = e.Id,
+            NumeroSerie = e.NumeroSerie,
+            Marca = e.Marca,
+            Modelo = e.Modelo,
+            Procesador = e.Procesador,
+            Laboratorio = e.Laboratorio,
+            FechaCompra = e.FechaCompra,
+            Estado = e.Estado,
+            FechaRegistro = e.FechaRegistro,
+            Mantenimientos = new List<MantenimientoResponseDto>()
+        })
+        .ToListAsync();
+}
 
     public async Task<HojaVidaDto?> ObtenerHojaVidaEquipoAsync(int id)
     {
@@ -183,5 +185,50 @@ public class InventarioService
             Equipo = equipo,
             Mantenimientos = mantenimientos
         };
+    }
+        public async Task<EquipoResponseDto?> ActualizarEquipoAsync(int id, ActualizarEquipoDto dto)
+    {
+        var equipo = await _context.Equipos
+            .FirstOrDefaultAsync(e => e.Id == id && !e.Eliminado);
+
+        if (equipo == null)
+            return null;
+
+        equipo.NumeroSerie = dto.NumeroSerie;
+        equipo.Marca = dto.Marca;
+        equipo.Modelo = dto.Modelo;
+        equipo.Procesador = dto.Procesador;
+        equipo.Laboratorio = dto.Laboratorio;
+        equipo.FechaCompra = dto.FechaCompra;
+        equipo.Estado = dto.Estado;
+
+        await _context.SaveChangesAsync();
+
+        return new EquipoResponseDto
+        {
+            Id = equipo.Id,
+            NumeroSerie = equipo.NumeroSerie,
+            Marca = equipo.Marca,
+            Modelo = equipo.Modelo,
+            Procesador = equipo.Procesador,
+            Laboratorio = equipo.Laboratorio,
+            FechaCompra = equipo.FechaCompra,
+            Estado = equipo.Estado,
+            FechaRegistro = equipo.FechaRegistro,
+            Mantenimientos = new List<MantenimientoResponseDto>()
+        };
+    }
+        public async Task<bool> EliminarEquipoAsync(int id)
+    {
+        var equipo = await _context.Equipos
+            .FirstOrDefaultAsync(e => e.Id == id && !e.Eliminado);
+
+        if (equipo == null)
+            return false;
+
+        equipo.Eliminado = true;
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }

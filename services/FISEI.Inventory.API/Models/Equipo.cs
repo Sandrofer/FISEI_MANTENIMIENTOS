@@ -11,6 +11,7 @@ public class Equipo
     public DateOnly FechaCompra { get; set; }
     public string Estado { get; set; } = "Activo";
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
+    public bool Eliminado { get; set; } = false; // ✅ NUEVO CAMPO
 
     public ICollection<Mantenimiento> Mantenimientos { get; set; } = new List<Mantenimiento>();
 }
