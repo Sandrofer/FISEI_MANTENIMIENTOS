@@ -89,7 +89,7 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
               onChange={(e) => setEstado(e.target.value)}
             >
               <option value="">Todos</option>
-              <option value="Activo">Activo</option>
+              <option value="Operativo">Operativo</option>
               <option value="En mantenimiento">En mantenimiento</option>
               <option value="Dado de baja">Dado de baja</option>
             </select>
@@ -179,7 +179,7 @@ export const InventarioPage = ({ basePath = '/admin' }: InventarioPageProps) => 
                     <td>{equipo.laboratorio}</td>
                     <td>
                       <span className={`badge ${
-                        equipo.estado === 'Activo' ? 'badge--success' :
+                        equipo.estado === 'Operativo' ? 'badge--success' :
                         equipo.estado === 'En mantenimiento' ? 'badge--primary' :
                         'badge--neutral'
                       }`}>{equipo.estado}</span>
