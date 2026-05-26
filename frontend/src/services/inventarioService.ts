@@ -25,10 +25,9 @@ export interface Mantenimiento {
   estado: string;
   tipo: string | null;
   responsable: string | null;
-  prioridad: string | null;
-  observaciones: string | null;
   diagnostico: string | null;
   accionesRealizadas: string | null;
+  observaciones: string | null;
 }
 
 export interface EquipoResponse {
