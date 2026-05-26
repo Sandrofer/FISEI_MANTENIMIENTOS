@@ -66,7 +66,11 @@ public class MaintenanceService
             FechaCreacion = DateTime.UtcNow
         };
 
-        if (dto.Tipo.Equals("Preventivo", StringComparison.OrdinalIgnoreCase))
+        if (dto.FechaProgramada.HasValue)
+        {
+            mantenimiento.FechaProgramada = dto.FechaProgramada.Value;
+        }
+        else if (dto.Tipo.Equals("Preventivo", StringComparison.OrdinalIgnoreCase))
         {
             // Lógica automática para fecha programada: si es preventivo, agendar a 6 meses
             mantenimiento.FechaProgramada = DateOnly.FromDateTime(DateTime.Today.AddMonths(6));

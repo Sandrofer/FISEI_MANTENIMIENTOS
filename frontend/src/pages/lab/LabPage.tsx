@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { InventarioPage } from '../admin/InventarioPage';
+import { MantenimientosDashboard } from '../mantenimiento/MantenimientosDashboard';
 
 export const LabPage = () => {
   const { usuario, cerrarSesion } = useAuth();
@@ -47,8 +48,8 @@ export const LabPage = () => {
             Registrar equipo
           </button>
           <button
-            onClick={() => navigate('/lab/mantenimientos')}
-            className={`sidebar__link ${location.pathname.includes('/mantenimientos') ? 'sidebar__link--active' : ''}`}
+            onClick={() => setSeccion('mantenimientos')}
+            className={`sidebar__link ${seccion === 'mantenimientos' ? 'sidebar__link--active' : ''}`}
           >
             <span className="sidebar__icon">MT</span>
             Mantenimientos
@@ -119,7 +120,7 @@ export const LabPage = () => {
                 <p>Ingresar un nuevo activo tecnologico con sus datos institucionales.</p>
               </button>
 
-              <button onClick={() => navigate('/lab/mantenimientos')} className="action-card">
+              <button onClick={() => setSeccion('mantenimientos')} className="action-card">
                 <span className="action-card__icon">MT</span>
                 <h3>Mantenimientos</h3>
                 <p>Gestionar peticiones de mantenimiento preventivo y correctivo.</p>
@@ -129,6 +130,7 @@ export const LabPage = () => {
         )}
 
         {seccion === 'inventario' && <InventarioPage basePath="/lab" />}
+        {seccion === 'mantenimientos' && <MantenimientosDashboard basePath="/lab" />}
       </main>
     </div>
   );
