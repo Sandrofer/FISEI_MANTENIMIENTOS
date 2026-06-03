@@ -2,6 +2,10 @@ import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LoginResponse } from '../types/auth';
 
+const STORAGE_TOKEN_KEY = 'fisei_token';
+const STORAGE_NAME_KEY = 'fisei_nombre';
+const STORAGE_ROLE_KEY = 'fisei_rol';
+
 interface AuthContextType {
   usuario: LoginResponse | null;
   guardarSesion: (data: LoginResponse) => void;
@@ -12,22 +16,24 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [usuario, setUsuario] = useState<LoginResponse | null>(() => {
-    const token = sessionStorage.getItem('token');
-    const nombre = sessionStorage.getItem('nombre');
-    const rol = sessionStorage.getItem('rol');
+    const token = localStorage.getItem(STORAGE_TOKEN_KEY);
+    const nombre = localStorage.getItem(STORAGE_NAME_KEY);
+    const rol = localStorage.getItem(STORAGE_ROLE_KEY);
     if (token && nombre && rol) return { token, nombre, rol };
     return null;
   });
 
   const guardarSesion = (data: LoginResponse) => {
-    sessionStorage.setItem('token', data.token);
-    sessionStorage.setItem('nombre', data.nombre);
-    sessionStorage.setItem('rol', data.rol);
+    localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
+    localStorage.setItem(STORAGE_NAME_KEY, data.nombre);
+    localStorage.setItem(STORAGE_ROLE_KEY, data.rol);
     setUsuario(data);
   };
 
   const cerrarSesion = () => {
-    sessionStorage.clear();
+    localStorage.removeItem(STORAGE_TOKEN_KEY);
+    localStorage.removeItem(STORAGE_NAME_KEY);
+    localStorage.removeItem(STORAGE_ROLE_KEY);
     setUsuario(null);
   };
 

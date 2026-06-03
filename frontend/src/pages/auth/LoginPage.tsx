@@ -1,85 +1,51 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { login } from '../../services/authService';
+import { authLoginUrl } from '../../services/authService';
 
 export const LoginPage = () => {
-  const [correo, setCorreo] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [cargando, setCargando] = useState(false);
-  const { guardarSesion } = useAuth();
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    const correoNormalizado = correo.trim().toLowerCase();
-    if (!correoNormalizado.endsWith('@uta.edu.ec')) {
-      setError('El correo debe ser institucional (@uta.edu.ec)');
-      return;
-    }
-    setCargando(true);
-    try {
-      const data = await login({ correo: correoNormalizado, password });
-      guardarSesion(data);
-      if (data.rol === 'Administrador') navigate('/admin');
-      else navigate('/lab');
-    } catch (err: any) {
-      if (err.response?.data?.mensaje) {
-        setError(err.response.data.mensaje);
-      } else {
-        setError('Credenciales incorrectas');
-      }
-    } finally {
-      setCargando(false);
-    }
-  };
-
   return (
     <main className="login-page">
-      <section className="login-card" aria-label="Inicio de sesion">
-        <div className="login-brand">
-          <span className="login-brand__mark">FI</span>
-          <h1>FISEI</h1>
-          <p>Sistema de Gestion de Mantenimientos</p>
+      <section className="login-panel" aria-label="Inicio de sesion">
+        <div className="login-panel__intro">
+          <div className="login-brand login-brand--left">
+            <span className="login-brand__mark">FI</span>
+            <div>
+              <h1>FISEI</h1>
+              <p>Sistema de Gestion de Mantenimientos</p>
+            </div>
+          </div>
+
+          <div className="login-hero-copy">
+            <span className="login-kicker">Acceso institucional</span>
+            <h2>Gestiona laboratorios, equipos y mantenimientos desde un solo lugar.</h2>
+            <p>
+              Ingresa con tu cuenta Microsoft registrada para acceder al panel segun tu rol.
+            </p>
+          </div>
+
+          <div className="login-highlights" aria-label="Funciones principales">
+            <span>Usuarios autorizados</span>
+            <span>Control por roles</span>
+            <span>Acceso seguro</span>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="form-grid">
-          <div className="form-field form-field--full">
-            <label className="form-label" htmlFor="correo">Correo institucional</label>
-            <input
-              id="correo"
-              type="email"
-              value={correo}
-              onChange={e => setCorreo(e.target.value)}
-              className="form-input"
-              placeholder="usuario@uta.edu.ec"
-              required
-            />
+        <div className="login-card">
+          <div className="login-card__header">
+            <span className="login-card__icon">M</span>
+            <div>
+              <h2>Iniciar sesion</h2>
+              <p>Usa tu correo institucional autorizado.</p>
+            </div>
           </div>
 
-          <div className="form-field form-field--full">
-            <label className="form-label" htmlFor="password">Contrasena</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="form-input"
-              placeholder="********"
-              required
-            />
-          </div>
+          <a href={authLoginUrl} className="btn btn--primary btn--full btn--login">
+            <span className="btn__icon">M</span>
+            Iniciar sesion con Microsoft
+          </a>
 
-          {error && <p className="alert alert--error form-field--full">{error}</p>}
-
-          <div className="form-field--full">
-            <button type="submit" disabled={cargando} className="btn btn--primary btn--full">
-              {cargando ? 'Ingresando...' : 'Ingresar'}
-            </button>
-          </div>
-        </form>
+          <p className="login-card__note">
+            Solo los correos registrados por el administrador pueden entrar al sistema.
+          </p>
+        </div>
       </section>
     </main>
   );

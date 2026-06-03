@@ -23,6 +23,7 @@ app.UseCors("FrontendPolicy");
 
 var routes = new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase)
 {
+    ["api/auth/microsoft"] = new(builder.Configuration["Services:MicrosoftAuth"] ?? "http://localhost:5260"),
     ["api/auth"] = new(builder.Configuration["Services:Auth"] ?? "http://localhost:5260"),
     ["api/usuarios"] = new(builder.Configuration["Services:Auth"] ?? "http://localhost:5260"),
     ["api/inventario"] = new(builder.Configuration["Services:Inventory"] ?? "http://localhost:5064"),

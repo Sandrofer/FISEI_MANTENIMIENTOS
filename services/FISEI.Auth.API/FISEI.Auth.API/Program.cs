@@ -2,10 +2,17 @@ using System.Text;
 using FISEI.Auth.API.Data;
 using FISEI.Auth.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var dataProtectionKeysPath = new DirectoryInfo(@"C:\Temp\DataProtectionKeys");
+dataProtectionKeysPath.Create();
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(dataProtectionKeysPath);
 
 builder.Services.AddCors(options =>
 {
@@ -17,11 +24,16 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddDbContext<AuthDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnection")));
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -37,7 +49,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -48,6 +61,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseCors("FiseiPolicy");
 app.UseAuthorization();

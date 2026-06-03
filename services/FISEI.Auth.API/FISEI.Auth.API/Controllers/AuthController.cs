@@ -10,13 +10,13 @@ namespace FISEI.Auth.API.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthDbContext _context;
-    private readonly TokenService _tokenService;
+    private readonly ApplicationDbContext _context;
+    private readonly JwtService _jwtService;
 
-    public AuthController(AuthDbContext context, TokenService tokenService)
+    public AuthController(ApplicationDbContext context, JwtService jwtService)
     {
         _context = context;
-        _tokenService = tokenService;
+        _jwtService = jwtService;
     }
 
     [HttpPost("login")]
@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
         if (!BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
             return Unauthorized(new { mensaje = "Credenciales incorrectas" });
 
-        var token = _tokenService.GenerarToken(usuario);
+        var token = _jwtService.GenerateToken(usuario);
 
         return Ok(new LoginResponseDto
         {

@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace FISEI.Auth.API.Data;
 
-public class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
+public class AuthDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {
-    public AuthDbContext CreateDbContext(string[] args)
+    public ApplicationDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         optionsBuilder.UseSqlServer("Server=SHANTALL\\SQLEXPRESS;Database=Usuarios;Trusted_Connection=True;TrustServerCertificate=True;");
 
-        return new AuthDbContext(optionsBuilder.Options);
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
 }

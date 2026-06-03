@@ -13,9 +13,9 @@ namespace FISEI.Auth.API.Controllers;
 public class UsuariosController : ControllerBase
 {
     private const string DominioInstitucional = "@uta.edu.ec";
-    private readonly AuthDbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public UsuariosController(AuthDbContext context)
+    public UsuariosController(ApplicationDbContext context)
     {
         _context = context;
     }
@@ -83,6 +83,7 @@ public class UsuariosController : ControllerBase
         return Ok(new { mensaje = "Rol actualizado correctamente" });
     }
 
+
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ActualizarUsuario(int id, [FromBody] ActualizarUsuarioDto dto)
@@ -91,10 +92,10 @@ public class UsuariosController : ControllerBase
         if (usuario == null) return NotFound(new { mensaje = "Usuario no encontrado" });
 
         var adminId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!int.TryParse(adminId, out var adminIdNumerico))
+        if (!int.TryParse(adminId, out var adminIdInt))
             return Unauthorized(new { mensaje = "Sesion invalida" });
 
-        var admin = await _context.Usuarios.FindAsync(adminIdNumerico);
+        var admin = await _context.Usuarios.FindAsync(adminIdInt);
         if (admin == null || !admin.Activo)
             return Unauthorized(new { mensaje = "Administrador no encontrado o inactivo" });
 
