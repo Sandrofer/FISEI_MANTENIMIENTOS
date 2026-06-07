@@ -6,9 +6,10 @@ import { getUsuarios } from '../../services/usuarioService';
 interface DetalleOrdenPageProps {
   ordenId: string;
   onVolver?: () => void;
+  equipoEnfocadoId?: string | null;
 }
 
-export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onVolver }) => {
+export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onVolver, equipoEnfocadoId }) => {
   const [orden, setOrden] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +44,14 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
     };
     fetchData();
   }, [ordenId]);
+
+  useEffect(() => {
+    if (!loading && equipoEnfocadoId) {
+      document
+        .getElementById(`detalle-equipo-${equipoEnfocadoId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [equipoEnfocadoId, loading]);
 
   const getNombreEquipo = (equipoId: string) => {
     const equipo = equipos.find(e => String(e.id) === String(equipoId));
@@ -340,12 +349,24 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 bg-white">
-              {orden.detallesMantenimientos?.map((detalle: any) => (
-                <tr key={detalle.id} className="hover:bg-slate-50/50 transition-colors">
+              {orden.detallesMantenimientos?.map((detalle: any) => {
+                const equipoEnfocado = equipoEnfocadoId && String(detalle.equipoId) === String(equipoEnfocadoId);
+
+                return (
+                <tr
+                  id={`detalle-equipo-${detalle.equipoId}`}
+                  key={detalle.id}
+                  className={`${equipoEnfocado ? 'bg-red-50/80 ring-2 ring-inset ring-red-200' : 'hover:bg-slate-50/50'} transition-colors`}
+                >
                   <td className="px-8 py-4">
-                    <span className="text-sm font-bold text-slate-800 font-mono bg-slate-100 px-2 py-1 rounded border border-slate-200" title={`ID: ${detalle.equipoId}`}>
+                    <span className={`text-sm font-bold font-mono px-2 py-1 rounded border ${equipoEnfocado ? 'bg-white text-red-800 border-red-200' : 'bg-slate-100 text-slate-800 border-slate-200'}`} title={`ID: ${detalle.equipoId}`}>
                       {getNombreEquipo(detalle.equipoId)}
                     </span>
+                    {equipoEnfocado && (
+                      <span className="ml-2 inline-flex rounded-full bg-red-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-red-800">
+                        Asignado
+                      </span>
+                    )}
                   </td>
                   <td className="px-8 py-4">
                     <span className="text-sm font-medium text-slate-600" title={`ID Usuario: ${detalle.laboratoristaAsignadoId}`}>
@@ -395,7 +416,8 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {(!orden.detallesMantenimientos || orden.detallesMantenimientos.length === 0) && (
                 <tr>
                   <td colSpan={4} className="px-8 py-10 text-center">

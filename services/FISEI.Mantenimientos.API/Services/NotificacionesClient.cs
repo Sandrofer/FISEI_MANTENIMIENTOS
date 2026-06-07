@@ -25,6 +25,12 @@ public class NotificacionesClient : INotificacionesClient
         return EnviarAsync(new CrearNotificacionRequest(usuarioId, codigoCaso, equipoId, mensaje, "COMPLETADO"));
     }
 
+    public Task EnviarCierreAsync(int usuarioId, string codigoCaso, Guid equipoId)
+    {
+        var mensaje = $"El caso {codigoCaso} fue cerrado.";
+        return EnviarAsync(new CrearNotificacionRequest(usuarioId, codigoCaso, equipoId, mensaje, "CIERRE"));
+    }
+
     private async Task EnviarAsync(CrearNotificacionRequest request)
     {
         try

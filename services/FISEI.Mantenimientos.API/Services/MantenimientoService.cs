@@ -115,6 +115,20 @@ namespace FISEI.Mantenimientos.API.Services
             casoMaestro.FechaCierre = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync();
+
+            var laboratoristasNotificados = casoMaestro.DetallesMantenimientos
+                .GroupBy(d => d.LaboratoristaAsignadoId)
+                .Select(g => g.First())
+                .ToList();
+
+            foreach (var detalle in laboratoristasNotificados)
+            {
+                await _notificacionesClient.EnviarCierreAsync(
+                    detalle.LaboratoristaAsignadoId,
+                    casoMaestro.CodigoCaso,
+                    detalle.EquipoId);
+            }
+
             return casoMaestro;
         }
 

@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { obtenerTodasLasOrdenes } from '../../services/mantenimientoService';
 
 interface MantenimientosPageProps {
   onNuevoClick: () => void;
   onVerDetalle: (orden: any) => void;
+  casoInicialCodigo?: string | null;
 }
 
-export const MantenimientosPage = ({ onNuevoClick, onVerDetalle }: MantenimientosPageProps) => {
+export const MantenimientosPage = ({ onNuevoClick, onVerDetalle, casoInicialCodigo }: MantenimientosPageProps) => {
   const [ordenes, setOrdenes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const ultimoCasoAbiertoRef = useRef<string | null>(null);
 
   const cargarDatos = async () => {
     try {
@@ -27,6 +29,18 @@ export const MantenimientosPage = ({ onNuevoClick, onVerDetalle }: Mantenimiento
   useEffect(() => {
     cargarDatos();
   }, []);
+
+  useEffect(() => {
+    if (loading || !casoInicialCodigo || ultimoCasoAbiertoRef.current === casoInicialCodigo) {
+      return;
+    }
+
+    const ordenEncontrada = ordenes.find((orden) => orden.codigoCaso === casoInicialCodigo);
+    if (ordenEncontrada) {
+      ultimoCasoAbiertoRef.current = casoInicialCodigo;
+      onVerDetalle(ordenEncontrada);
+    }
+  }, [casoInicialCodigo, loading, onVerDetalle, ordenes]);
 
   const countPendientes = (orden: any) => {
     if (!orden.detallesMantenimientos) return 0;

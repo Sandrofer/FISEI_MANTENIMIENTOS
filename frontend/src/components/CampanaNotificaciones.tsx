@@ -59,6 +59,18 @@ export const CampanaNotificaciones = () => {
     setNotificaciones([]);
   };
 
+  const abrirNotificacion = async (notificacion: NotificacionDto) => {
+    setAbierto(false);
+    setNotificaciones((actuales) => actuales.filter((n) => n.id !== notificacion.id));
+
+    try {
+      await axios.patch(`${API_URL}/marcar-leidas`, [notificacion.id], getHeaders());
+    } catch (error) {
+      console.error('No se pudo marcar la notificacion como leida', error);
+      void cargarNotificaciones();
+    }
+  };
+
   return (
     <div ref={contenedorRef} className="relative z-40">
       <button
@@ -102,8 +114,8 @@ export const CampanaNotificaciones = () => {
               notificaciones.map((notificacion) => (
                 <Link
                   key={notificacion.id}
-                  to={`/mis-mantenimientos?caso=${encodeURIComponent(notificacion.codigoCaso)}`}
-                  onClick={() => setAbierto(false)}
+                  to={`/mis-mantenimientos?caso=${encodeURIComponent(notificacion.codigoCaso)}&equipo=${encodeURIComponent(notificacion.equipoId)}`}
+                  onClick={() => void abrirNotificacion(notificacion)}
                   className="block border-b border-slate-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-slate-50"
                 >
                   <div className="flex items-center justify-between gap-3">

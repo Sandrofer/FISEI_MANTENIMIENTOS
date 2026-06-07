@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MantenimientosPage } from './MantenimientosPage';
 import { NuevaOrdenPage } from './NuevaOrdenPage';
 import { DetalleOrdenPage } from './DetalleOrdenPage';
@@ -11,23 +12,41 @@ export type VistaMantenimiento = 'lista' | 'crear' | 'detalle';
 
 export const MantenimientosDashboard = ({ basePath }: MantenimientosDashboardProps) => {
   console.log(basePath); // Consume basePath
+  const [searchParams, setSearchParams] = useSearchParams();
   const [vista, setVista] = useState<VistaMantenimiento>('lista');
   const [mantenimientoSeleccionadoId, setMantenimientoSeleccionadoId] = useState<string | null>(null);
+  const casoNotificacion = searchParams.get('caso');
+  const equipoNotificacion = searchParams.get('equipo');
+
+  useEffect(() => {
+    if (casoNotificacion) {
+      setVista('lista');
+      setMantenimientoSeleccionadoId(null);
+    }
+  }, [casoNotificacion, equipoNotificacion]);
 
   const irACrear = () => {
+    if (casoNotificacion || equipoNotificacion) {
+      setSearchParams({}, { replace: true });
+    }
     setVista('crear');
     setMantenimientoSeleccionadoId(null);
   };
 
   const irALista = () => {
+    if (casoNotificacion || equipoNotificacion) {
+      setSearchParams({}, { replace: true });
+    }
     setVista('lista');
     setMantenimientoSeleccionadoId(null);
   };
 
-  const verDetalle = (ordenId: string) => {
+  const verDetalle = useCallback((ordenId: string) => {
     setMantenimientoSeleccionadoId(ordenId);
     setVista('detalle');
-  };
+  }, []);
+
+  const equipoEnfocadoId = useMemo(() => equipoNotificacion, [equipoNotificacion]);
 
   return (
     <div className="flex flex-col h-full bg-slate-50">
@@ -35,6 +54,7 @@ export const MantenimientosDashboard = ({ basePath }: MantenimientosDashboardPro
         <MantenimientosPage 
           onNuevoClick={irACrear} 
           onVerDetalle={(m) => verDetalle(m.id?.toString() || m.codigoCaso || '')} 
+          casoInicialCodigo={casoNotificacion}
         />
       )}
       
@@ -49,6 +69,7 @@ export const MantenimientosDashboard = ({ basePath }: MantenimientosDashboardPro
         <DetalleOrdenPage 
           ordenId={mantenimientoSeleccionadoId} 
           onVolver={irALista} 
+          equipoEnfocadoId={equipoEnfocadoId}
         />
       )}
     </div>
