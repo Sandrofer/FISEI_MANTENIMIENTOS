@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -34,6 +35,11 @@ function App() {
               <LabPage />
             </ProtectedRoute>
           } />
+          <Route path="/mis-mantenimientos" element={
+            <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+              <LabPage />
+            </ProtectedRoute>
+          } />
           <Route path="/lab/inventario/:id/hoja-vida" element={
             <ProtectedRoute rolesPermitidos={['Laboratorista']}>
               <HojaVidaPage />
@@ -47,6 +53,7 @@ function App() {
           <Route path="/auth/callback" element={<MicrosoftCallbackPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        <Toaster position="top-right" />
       </BrowserRouter>
     </AuthProvider>
   );

@@ -19,6 +19,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<FISEI.Mantenimientos.API.Services.IMantenimientoService, FISEI.Mantenimientos.API.Services.MantenimientoService>();
+builder.Services.AddHttpClient<FISEI.Mantenimientos.API.Services.INotificacionesClient, FISEI.Mantenimientos.API.Services.NotificacionesClient>(client =>
+{
+    var baseUrl = builder.Configuration["Notificaciones:BaseUrl"] ?? "http://localhost:5086/";
+    client.BaseAddress = new Uri(baseUrl);
+});
 
 // Configure EF Core
 builder.Services.AddDbContext<MantenimientosDbContext>(options =>

@@ -3,6 +3,8 @@
     <Project Path="gateway/FISEI.Gateway/FISEI.Gateway.csproj" />
     <Project Path="services/FISEI.Inventory.API/FISEI.Inventory.API.csproj" />
     <Project Path="services/FISEI.Maintenance.API/FISEI.Maintenance.API.csproj" />
+    <Project Path="services/FISEI.Mantenimientos.API/FISEI.Mantenimientos.API.csproj" />
+    <Project Path="services/FISEI.Notificaciones.API/FISEI.Notificaciones.API.csproj" />
   </Folder>
   <Folder Name="/services/FISEI.Auth.API/">
     <Project Path="services/FISEI.Auth.API/FISEI.Auth.API/FISEI.Auth.API.csproj" />

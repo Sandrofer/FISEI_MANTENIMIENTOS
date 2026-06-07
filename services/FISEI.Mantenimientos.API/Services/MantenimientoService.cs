@@ -10,10 +10,12 @@ namespace FISEI.Mantenimientos.API.Services
     public class MantenimientoService : IMantenimientoService
     {
         private readonly MantenimientosDbContext _dbContext;
+        private readonly INotificacionesClient _notificacionesClient;
 
-        public MantenimientoService(MantenimientosDbContext dbContext)
+        public MantenimientoService(MantenimientosDbContext dbContext, INotificacionesClient notificacionesClient)
         {
             _dbContext = dbContext;
+            _notificacionesClient = notificacionesClient;
         }
 
         public async Task<CasosMantenimiento> CrearOrdenAsync(CrearOrdenRequestDto request, int usuarioId)
@@ -76,6 +78,14 @@ namespace FISEI.Mantenimientos.API.Services
                 nuevoCaso.DetallesMantenimientos = await _dbContext.DetallesMantenimientos
                     .Where(d => d.CasoId == nuevoCaso.Id).ToListAsync();
 
+                foreach (var detalle in nuevoCaso.DetallesMantenimientos)
+                {
+                    await _notificacionesClient.EnviarAsignacionAsync(
+                        detalle.LaboratoristaAsignadoId,
+                        nuevoCaso.CodigoCaso,
+                        detalle.EquipoId);
+                }
+
                 return nuevoCaso;
             }
             catch
@@ -111,6 +121,7 @@ namespace FISEI.Mantenimientos.API.Services
         public async Task<DetallesMantenimiento> ActualizarEstadoAsync(Guid ordenId, Guid detalleId, ActualizarEstadoRequestDto request)
         {
             var detalle = await _dbContext.DetallesMantenimientos
+                .Include(d => d.Caso)
                 .FirstOrDefaultAsync(d => d.Id == detalleId && d.CasoId == ordenId);
 
             if (detalle == null)
@@ -132,6 +143,7 @@ namespace FISEI.Mantenimientos.API.Services
                 throw new Exception("No se permite retroceder el estado del mantenimiento");
             }
 
+            var estadoAnterior = detalle.EstadoIndividual;
             detalle.EstadoIndividual = request.EstadoIndividual;
 
             if (detalle.EstadoIndividual == "En Proceso" && detalle.FechaInicio == null)
@@ -141,10 +153,18 @@ namespace FISEI.Mantenimientos.API.Services
             else if ((detalle.EstadoIndividual == "Finalizado" || detalle.EstadoIndividual == "No Reparado (De Baja)") && detalle.FechaFin == null)
             {
                 detalle.FechaFin = DateTime.Now;
-                // Aquí iría la llamada HTTP al microservicio de notificaciones como pide US-MANT-05
             }
 
             await _dbContext.SaveChangesAsync();
+
+            if (estadoAnterior != "Finalizado" && detalle.EstadoIndividual == "Finalizado")
+            {
+                await _notificacionesClient.EnviarCompletadoAsync(
+                    detalle.LaboratoristaAsignadoId,
+                    detalle.Caso.CodigoCaso,
+                    detalle.EquipoId);
+            }
+
             return detalle;
         }
     }

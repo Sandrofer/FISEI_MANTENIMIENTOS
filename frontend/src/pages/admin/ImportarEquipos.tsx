@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo } from 'react';
 import { descargarPlantillaEquipos, importarEquipos, validarImportacionExcel } from '../../services/inventarioApi';
-import type { ErrorImportacion, ImportacionEquiposResponse, ResumenValidacion } from '../../services/inventarioApi';
+import type { ImportacionEquiposResponse, ResumenValidacion } from '../../services/inventarioApi';
 
 export const ImportarEquipos = () => {
   const [paso, setPaso] = useState<1 | 2>(1);

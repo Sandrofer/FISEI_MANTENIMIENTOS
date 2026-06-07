@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { CampanaNotificaciones } from '../../components/CampanaNotificaciones';
 import { InventarioPage } from '../admin/InventarioPage';
 import RegistrarEquipoPage from '../inventario/RegistrarEquipoPage';
 import { MantenimientosDashboard } from '../mantenimiento/MantenimientosDashboard';
@@ -8,7 +9,14 @@ import { MantenimientosDashboard } from '../mantenimiento/MantenimientosDashboar
 export const LabPage = () => {
   const { usuario, cerrarSesion } = useAuth();
   const navigate = useNavigate();
-  const [seccion, setSeccion] = useState('inicio');
+  const location = useLocation();
+  const [seccion, setSeccion] = useState(location.pathname === '/mis-mantenimientos' ? 'mantenimientos' : 'inicio');
+
+  useEffect(() => {
+    if (location.pathname === '/mis-mantenimientos') {
+      setSeccion('mantenimientos');
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     cerrarSesion();
@@ -77,7 +85,10 @@ export const LabPage = () => {
             <p className="topbar__eyebrow">Panel laboratorista</p>
             <h2 className="topbar__title">Gestion de mantenimientos FISEI</h2>
           </div>
-          <span className="topbar__meta">Universidad Tecnica de Ambato</span>
+          <div className="flex items-center gap-3">
+            {usuario?.rol === 'Laboratorista' && <CampanaNotificaciones />}
+            <span className="topbar__meta">Universidad Tecnica de Ambato</span>
+          </div>
         </header>
 
         {seccion === 'inicio' && (
