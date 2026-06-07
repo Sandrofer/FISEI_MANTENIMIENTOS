@@ -14,6 +14,7 @@ builder.Services.AddDbContext<MaintenanceDbContext>(options =>
 
 // Servicios
 builder.Services.AddScoped<InventarioService>();
+builder.Services.AddScoped<ExcelImportService>();
 
 // CORS para el frontend
 builder.Services.AddCors(options =>

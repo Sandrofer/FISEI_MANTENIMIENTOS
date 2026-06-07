@@ -2,26 +2,34 @@ namespace Inventory.API.DTOs;
 
 public class CrearEquipoDto
 {
+    public string CodigoInventario { get; set; } = string.Empty;
     public string NumeroSerie { get; set; } = string.Empty;
-    public string Marca { get; set; } = string.Empty;
-    public string Modelo { get; set; } = string.Empty;
-    public string Procesador { get; set; } = string.Empty;
-    public string Laboratorio { get; set; } = string.Empty;
-    public DateOnly FechaCompra { get; set; }
+    public string NombreModelo { get; set; } = string.Empty;
+    public int CategoriaId { get; set; }
+    public int MarcaId { get; set; }
+    public int UbicacionId { get; set; }
+    public string Estado { get; set; } = "Operativo";
+    public Guid? ResponsableId { get; set; }
+    public string EspecificacionesTecnicas { get; set; } = "{}";
 }
 
 public class EquipoResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
+    public string CodigoInventario { get; set; } = string.Empty;
     public string NumeroSerie { get; set; } = string.Empty;
+    public string NombreModelo { get; set; } = string.Empty;
+    public int CategoriaId { get; set; }
+    public string Categoria { get; set; } = string.Empty;
+    public int MarcaId { get; set; }
     public string Marca { get; set; } = string.Empty;
-    public string Modelo { get; set; } = string.Empty;
-    public string Procesador { get; set; } = string.Empty;
-    public string Laboratorio { get; set; } = string.Empty;
-    public DateOnly FechaCompra { get; set; }
+    public int UbicacionId { get; set; }
+    public string Ubicacion { get; set; } = string.Empty;
     public string Estado { get; set; } = string.Empty;
+    public Guid? ResponsableId { get; set; }
+    public string EspecificacionesTecnicas { get; set; } = "{}";
     public DateTime FechaRegistro { get; set; }
-    public List<MantenimientoResponseDto> Mantenimientos { get; set; } = new();
+    public Guid? LoteImportacionId { get; set; }
 }
 
 public class MantenimientoResponseDto

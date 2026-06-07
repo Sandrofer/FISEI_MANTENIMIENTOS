@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { UsuariosPage } from './UsuariosPage';
 import { InventarioPage } from './InventarioPage';
+import { ImportarEquipos } from './ImportarEquipos';
 import RegistrarEquipoPage from '../inventario/RegistrarEquipoPage';
 import { MantenimientosDashboard } from '../mantenimiento/MantenimientosDashboard';
 
@@ -55,6 +56,13 @@ export const AdminPage = () => {
           >
             <span className="sidebar__icon"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg></span>
             Registrar equipo
+          </button>
+          <button
+            onClick={() => setSeccion('importar-equipos')}
+            className={`sidebar__link ${seccion === 'importar-equipos' ? 'sidebar__link--active' : ''}`}
+          >
+            <span className="sidebar__icon"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 16V4m0 12l-4-4m4 4l4-4M4 20h16" /></svg></span>
+            Importar equipos
           </button>
           <button
             onClick={() => setSeccion('mantenimientos')}
@@ -147,6 +155,7 @@ export const AdminPage = () => {
         {seccion === 'usuarios' && <UsuariosPage />}
         {seccion === 'inventario' && <InventarioPage />}
         {seccion === 'registrar-equipo' && <RegistrarEquipoPage />}
+        {seccion === 'importar-equipos' && <ImportarEquipos />}
         {seccion === 'mantenimientos' && <MantenimientosDashboard basePath="/admin" />}
       </main>
     </div>

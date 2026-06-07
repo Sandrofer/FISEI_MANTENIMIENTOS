@@ -5,34 +5,93 @@ namespace Inventory.API.Data;
 
 public class InventoryDbContext : DbContext
 {
-    public InventoryDbContext(DbContextOptions<InventoryDbContext> options) 
+    public InventoryDbContext(DbContextOptions<InventoryDbContext> options)
         : base(options) { }
 
-    public DbSet<Equipo> Equipos { get; set; }
-    public DbSet<Mantenimiento> Mantenimientos { get; set; }
+    public DbSet<Equipo> Equipos => Set<Equipo>();
+    public DbSet<Categoria> Categorias => Set<Categoria>();
+    public DbSet<Marca> Marcas => Set<Marca>();
+    public DbSet<Ubicacion> Ubicaciones => Set<Ubicacion>();
+    public DbSet<LoteImportacion> LotesImportacion => Set<LoteImportacion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Equipo>(entity =>
+        modelBuilder.Entity<Categoria>(entity =>
         {
-            entity.ToTable("Equipos");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Marca).HasMaxLength(100).IsRequired();
-            entity.Property(e => e.Modelo).HasMaxLength(100).IsRequired();
-            entity.Property(e => e.Procesador).HasMaxLength(150).IsRequired();
-            entity.Property(e => e.Laboratorio).HasMaxLength(100).IsRequired();
-            entity.Property(e => e.Estado).HasMaxLength(50).IsRequired();
+            entity.ToTable("categorias");
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Id).HasColumnName("id");
+            entity.Property(c => c.Nombre).HasColumnName("nombre").HasMaxLength(50).IsRequired();
+            entity.HasIndex(c => c.Nombre).IsUnique();
         });
 
-        modelBuilder.Entity<Mantenimiento>(entity =>
+        modelBuilder.Entity<Marca>(entity =>
         {
-            entity.ToTable("Mantenimientos");
+            entity.ToTable("marcas");
             entity.HasKey(m => m.Id);
-            entity.Property(m => m.Estado).HasMaxLength(50).IsRequired();
-            entity.Property(m => m.Observaciones).HasMaxLength(500);
-            entity.HasOne(m => m.Equipo)
-                  .WithMany(e => e.Mantenimientos)
-                  .HasForeignKey(m => m.EquipoId);
+            entity.Property(m => m.Id).HasColumnName("id");
+            entity.Property(m => m.Nombre).HasColumnName("nombre").HasMaxLength(50).IsRequired();
+            entity.HasIndex(m => m.Nombre).IsUnique();
+        });
+
+        modelBuilder.Entity<Ubicacion>(entity =>
+        {
+            entity.ToTable("ubicaciones");
+            entity.HasKey(u => u.Id);
+            entity.Property(u => u.Id).HasColumnName("id");
+            entity.Property(u => u.Nombre).HasColumnName("nombre").HasMaxLength(100).IsRequired();
+        });
+
+        modelBuilder.Entity<LoteImportacion>(entity =>
+        {
+            entity.ToTable("lotes_importacion");
+            entity.HasKey(l => l.Id);
+            entity.Property(l => l.Id).HasColumnName("id");
+            entity.Property(l => l.UsuarioId).HasColumnName("usuario_id").IsRequired();
+            entity.Property(l => l.NombreArchivo).HasColumnName("nombre_archivo").HasMaxLength(255).IsRequired();
+            entity.Property(l => l.TotalRegistros).HasColumnName("total_registros").IsRequired();
+            entity.Property(l => l.FechaImportacion).HasColumnName("fecha_importacion").IsRequired();
+        });
+
+        modelBuilder.Entity<Equipo>(entity =>
+        {
+            entity.ToTable("equipos");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CodigoInventario).HasColumnName("codigo_inventario").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.NumeroSerie).HasColumnName("numero_serie").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.NombreModelo).HasColumnName("nombre_modelo").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.CategoriaId).HasColumnName("categoria_id").IsRequired();
+            entity.Property(e => e.MarcaId).HasColumnName("marca_id").IsRequired();
+            entity.Property(e => e.UbicacionId).HasColumnName("ubicacion_id").IsRequired();
+            entity.Property(e => e.Estado).HasColumnName("estado").HasMaxLength(30).IsRequired();
+            entity.Property(e => e.ResponsableId).HasColumnName("responsable_id");
+            entity.Property(e => e.EspecificacionesTecnicas).HasColumnName("especificaciones_tecnicas").IsRequired();
+            entity.Property(e => e.FechaRegistro).HasColumnName("fecha_registro").IsRequired();
+            entity.Property(e => e.LoteImportacionId).HasColumnName("lote_importacion_id");
+
+            entity.HasIndex(e => e.CodigoInventario).IsUnique();
+            entity.HasIndex(e => e.NumeroSerie).IsUnique();
+
+            entity.HasOne(e => e.Categoria)
+                .WithMany(c => c.Equipos)
+                .HasForeignKey(e => e.CategoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Marca)
+                .WithMany(m => m.Equipos)
+                .HasForeignKey(e => e.MarcaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Ubicacion)
+                .WithMany(u => u.Equipos)
+                .HasForeignKey(e => e.UbicacionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.LoteImportacion)
+                .WithMany(l => l.Equipos)
+                .HasForeignKey(e => e.LoteImportacionId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

@@ -5,6 +5,7 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { MicrosoftCallbackPage } from './pages/auth/MicrosoftCallbackPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { HojaVidaPage } from './pages/admin/HojaVidaPage';
+import { ImportarEquipos } from './pages/admin/ImportarEquipos';
 import { LabPage } from './pages/lab/LabPage';
 import './App.css';
 
@@ -19,6 +20,15 @@ function App() {
               <AdminPage />
             </ProtectedRoute>
           } />
+          <Route path="/admin/inventario/importar" element={
+            <ProtectedRoute rolesPermitidos={['Administrador']}>
+              <div className="admin-layout">
+                <main className="main-panel">
+                  <ImportarEquipos />
+                </main>
+              </div>
+            </ProtectedRoute>
+          } />
           <Route path="/lab" element={
             <ProtectedRoute rolesPermitidos={['Laboratorista']}>
               <LabPage />
@@ -30,7 +40,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/admin/inventario/:id/hoja-vida" element={
-            <ProtectedRoute rolesPermitidos={['Administrador', 'Técnico', 'Tecnico']}>
+            <ProtectedRoute rolesPermitidos={['Administrador', 'Tecnico']}>
               <HojaVidaPage />
             </ProtectedRoute>
           } />
