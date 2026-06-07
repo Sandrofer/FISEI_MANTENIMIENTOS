@@ -1,4 +1,3 @@
-using FISEI.Maintenance.API.Data;
 using Inventory.API.Data;
 using Inventory.API.DTOs;
 using Inventory.API.Models;
@@ -9,12 +8,12 @@ namespace Inventory.API.Services;
 public class InventarioService
 {
     private readonly InventoryDbContext _context;
-    private readonly MaintenanceDbContext _maintenanceContext;
+    // private readonly MaintenanceDbContext _maintenanceContext;
 
-    public InventarioService(InventoryDbContext context, MaintenanceDbContext maintenanceContext)
+    public InventarioService(InventoryDbContext context)//, MaintenanceDbContext maintenanceContext)
     {
         _context = context;
-        _maintenanceContext = maintenanceContext;
+        // _maintenanceContext = maintenanceContext;
     }
 
     public async Task<EquipoResponseDto> RegistrarEquipoAsync(CrearEquipoDto dto)

@@ -100,3 +100,53 @@ export const completarMantenimiento = async (id: number, dto: CompletarMantenimi
 export const cancelarMantenimiento = async (id: number): Promise<void> => {
   await axios.put(`${API_URL}/${id}/cancelar`, {}, getHeaders());
 };
+
+// --- NUEVOS ENDPOINTS (Sprint 3) ---
+
+export interface DetalleEquipoRequestDto {
+  equipoId: string;
+  laboratoristaAsignadoId: string;
+}
+
+export interface CrearOrdenRequestDto {
+  fechaIngreso: string;
+  descripcionGeneral?: string;
+  tipoMantenimiento: string;
+  equipos: {
+    equipoId: string;
+    laboratoristaAsignadoId: string;
+  }[];
+}
+
+export interface ActualizarEstadoRequestDto {
+  estadoIndividual: string;
+}
+
+export const crearOrdenMantenimiento = async (dto: CrearOrdenRequestDto) => {
+  const res = await axios.post(`${API_URL}/ordenes`, dto, getHeaders());
+  return res.data;
+};
+
+export const obtenerTodasLasOrdenes = async () => {
+  const res = await axios.get(`${API_URL}/ordenes`, getHeaders());
+  return res.data;
+};
+
+export const obtenerOrdenPorId = async (id: string) => {
+  const res = await axios.get(`${API_URL}/ordenes/${id}`, getHeaders());
+  return res.data;
+};
+
+export const cerrarOrdenMaestra = async (id: string) => {
+  const res = await axios.patch(`${API_URL}/ordenes/${id}/cerrar`, {}, getHeaders());
+  return res.data;
+};
+
+export const actualizarEstadoDetalle = async (ordenId: string, detalleId: string, estadoIndividual: string) => {
+  const res = await axios.patch(
+    `${API_URL}/ordenes/${ordenId}/detalle/${detalleId}/estado`,
+    { estadoIndividual },
+    getHeaders()
+  );
+  return res.data;
+};

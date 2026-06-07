@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { MantenimientosPage } from './MantenimientosPage';
-import { MantenimientoForm } from './MantenimientoForm';
-import { MantenimientoDetalle } from './MantenimientoDetalle';
-import type { MantenimientoDto } from '../../services/mantenimientoService';
+import { NuevaOrdenPage } from './NuevaOrdenPage';
+import { DetalleOrdenPage } from './DetalleOrdenPage';
 
 interface MantenimientosDashboardProps {
   basePath: string;
@@ -13,20 +12,20 @@ export type VistaMantenimiento = 'lista' | 'crear' | 'detalle';
 export const MantenimientosDashboard = ({ basePath }: MantenimientosDashboardProps) => {
   console.log(basePath); // Consume basePath
   const [vista, setVista] = useState<VistaMantenimiento>('lista');
-  const [mantenimientoSeleccionado, setMantenimientoSeleccionado] = useState<MantenimientoDto | null>(null);
+  const [mantenimientoSeleccionadoId, setMantenimientoSeleccionadoId] = useState<string | null>(null);
 
   const irACrear = () => {
     setVista('crear');
-    setMantenimientoSeleccionado(null);
+    setMantenimientoSeleccionadoId(null);
   };
 
   const irALista = () => {
     setVista('lista');
-    setMantenimientoSeleccionado(null);
+    setMantenimientoSeleccionadoId(null);
   };
 
-  const verDetalle = (mantenimiento: MantenimientoDto) => {
-    setMantenimientoSeleccionado(mantenimiento);
+  const verDetalle = (ordenId: string) => {
+    setMantenimientoSeleccionadoId(ordenId);
     setVista('detalle');
   };
 
@@ -35,23 +34,24 @@ export const MantenimientosDashboard = ({ basePath }: MantenimientosDashboardPro
       {vista === 'lista' && (
         <MantenimientosPage 
           onNuevoClick={irACrear} 
-          onVerDetalle={verDetalle} 
+          onVerDetalle={(m) => verDetalle(m.id?.toString() || m.codigoCaso || '')} 
         />
       )}
       
       {vista === 'crear' && (
-        <MantenimientoForm 
-          onCancel={irALista} 
-          onSuccess={irALista} 
-        />
+        <div className="relative">
+           <button onClick={irALista} className="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded z-10">Volver a la lista</button>
+           <NuevaOrdenPage />
+        </div>
       )}
 
-      {vista === 'detalle' && mantenimientoSeleccionado && (
-        <MantenimientoDetalle 
-          mantenimientoId={mantenimientoSeleccionado.id} 
+      {vista === 'detalle' && mantenimientoSeleccionadoId && (
+        <DetalleOrdenPage 
+          ordenId={mantenimientoSeleccionadoId} 
           onVolver={irALista} 
         />
       )}
     </div>
   );
 };
+
