@@ -50,7 +50,7 @@ public class InventarioController : ControllerBase
             });
         }
 
-        if (!TryGetUsuarioId(out var usuarioId))
+        if (!TryGetUsuarioId(out var usuarioId, out var responsableId))
         {
             return Unauthorized(new
             {
@@ -61,7 +61,7 @@ public class InventarioController : ControllerBase
 
         try
         {
-            var resultado = await _excelImportService.ImportarAsync(archivo, usuarioId, importacionParcial, autoCrear, cancellationToken);
+            var resultado = await _excelImportService.ImportarAsync(archivo, usuarioId, responsableId, importacionParcial, autoCrear, cancellationToken);
             return resultado.Success ? Ok(resultado) : BadRequest(resultado);
         }
         catch (Exception ex)
@@ -174,9 +174,9 @@ public class InventarioController : ControllerBase
         return Ok(new { mensaje = "Equipo eliminado correctamente" });
     }
 
-    private bool TryGetUsuarioId(out Guid usuarioId)
+    private bool TryGetUsuarioId(out Guid usuarioId, out int responsableId)
     {
-        if (TryReadUsuarioId(User.Claims, out usuarioId))
+        if (TryReadUsuarioId(User.Claims, out usuarioId, out responsableId))
         {
             return true;
         }
@@ -185,6 +185,7 @@ public class InventarioController : ControllerBase
         if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
         {
             usuarioId = Guid.Empty;
+            responsableId = 0;
             return false;
         }
 
@@ -192,16 +193,17 @@ public class InventarioController : ControllerBase
         {
             var token = authorization["Bearer ".Length..].Trim();
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            return TryReadUsuarioId(jwt.Claims, out usuarioId);
+            return TryReadUsuarioId(jwt.Claims, out usuarioId, out responsableId);
         }
         catch
         {
             usuarioId = Guid.Empty;
+            responsableId = 0;
             return false;
         }
     }
 
-    private static bool TryReadUsuarioId(IEnumerable<Claim> claims, out Guid usuarioId)
+    private static bool TryReadUsuarioId(IEnumerable<Claim> claims, out Guid usuarioId, out int responsableId)
     {
         var idClaimTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -219,18 +221,21 @@ public class InventarioController : ControllerBase
             .FirstOrDefault(c => idClaimTypes.Contains(c.Type))
             ?.Value;
 
-        if (Guid.TryParse(rawUserId, out usuarioId))
-        {
-            return true;
-        }
-
         if (int.TryParse(rawUserId, out var numericUserId) && numericUserId > 0)
         {
+            responsableId = numericUserId;
             usuarioId = Guid.Parse($"00000000-0000-0000-0000-{numericUserId:000000000000}");
             return true;
         }
 
+        if (Guid.TryParse(rawUserId, out usuarioId))
+        {
+            responsableId = 0;
+            return true;
+        }
+
         usuarioId = Guid.Empty;
+        responsableId = 0;
         return false;
     }
 }

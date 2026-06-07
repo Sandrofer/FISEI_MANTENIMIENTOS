@@ -9,7 +9,7 @@ public class CrearEquipoDto
     public int MarcaId { get; set; }
     public int UbicacionId { get; set; }
     public string Estado { get; set; } = "Operativo";
-    public Guid? ResponsableId { get; set; }
+    public int ResponsableId { get; set; }
     public string EspecificacionesTecnicas { get; set; } = "{}";
 }
 
@@ -26,7 +26,7 @@ public class EquipoResponseDto
     public int UbicacionId { get; set; }
     public string Ubicacion { get; set; } = string.Empty;
     public string Estado { get; set; } = string.Empty;
-    public Guid? ResponsableId { get; set; }
+    public int ResponsableId { get; set; }
     public string EspecificacionesTecnicas { get; set; } = "{}";
     public DateTime FechaRegistro { get; set; }
     public Guid? LoteImportacionId { get; set; }

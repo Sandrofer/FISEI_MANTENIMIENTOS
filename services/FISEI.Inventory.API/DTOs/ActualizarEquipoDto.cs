@@ -9,6 +9,6 @@ public class ActualizarEquipoDto
     public int MarcaId { get; set; }
     public int UbicacionId { get; set; }
     public string Estado { get; set; } = string.Empty;
-    public Guid? ResponsableId { get; set; }
+    public int ResponsableId { get; set; }
     public string EspecificacionesTecnicas { get; set; } = "{}";
 }
