@@ -37,7 +37,7 @@ export const MantenimientosPage = ({ onNuevoClick, onVerDetalle }: Mantenimiento
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <div>
-          <h2 className="text-2xl font-bold text-primary tracking-tight">Gestión de Mantenimientos (Órdenes Maestras)</h2>
+          <h2 className="text-2xl font-bold text-primary tracking-tight">Gestión de Mantenimientos</h2>
           <p className="text-slate-500 mt-1">Controle y dé seguimiento a las peticiones de mantenimiento con múltiples equipos.</p>
         </div>
         <button
@@ -59,7 +59,6 @@ export const MantenimientosPage = ({ onNuevoClick, onVerDetalle }: Mantenimiento
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-6 py-4 text-sm font-semibold text-primary">ID Caso</th>
                 <th className="px-6 py-4 text-sm font-semibold text-primary">Código</th>
                 <th className="px-6 py-4 text-sm font-semibold text-primary">Fecha Ingreso</th>
                 <th className="px-6 py-4 text-sm font-semibold text-primary">Tipo</th>
@@ -80,12 +79,11 @@ export const MantenimientosPage = ({ onNuevoClick, onVerDetalle }: Mantenimiento
                 </tr>
               ) : (
                 ordenes.map((orden) => (
-                  <tr 
-                    key={orden.id} 
+                  <tr
+                    key={orden.id}
                     className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
                     onClick={() => onVerDetalle(orden)}
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-slate-700 truncate max-w-[100px]" title={orden.id}>{orden.id.substring(0, 8)}...</td>
                     <td className="px-6 py-4 font-bold text-slate-800">{orden.codigoCaso}</td>
                     <td className="px-6 py-4 text-sm text-slate-600">{new Date(orden.fechaIngreso).toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-sm text-slate-600">{orden.tipoMantenimiento}</td>

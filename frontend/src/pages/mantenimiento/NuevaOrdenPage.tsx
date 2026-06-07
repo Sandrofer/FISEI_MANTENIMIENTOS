@@ -9,32 +9,33 @@ export const NuevaOrdenPage: React.FC = () => {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [laboratoristas, setLaboratoristas] = useState<any[]>([]);
   const [laboratoriosUnicos, setLaboratoriosUnicos] = useState<string[]>([]);
-  
+
   const [laboratorioFiltro, setLaboratorioFiltro] = useState<string>('');
   const [fechaIngreso, setFechaIngreso] = useState<string>(new Date().toISOString().split('T')[0]);
   const [descripcionGeneral, setDescripcionGeneral] = useState<string>('');
   const [tipoMantenimiento, setTipoMantenimiento] = useState<string>('Preventivo');
-  
+
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<string>('');
   const [laboratoristaSeleccionado, setLaboratoristaSeleccionado] = useState<string>('');
-  
-  const [detallesAgregados, setDetallesAgregados] = useState<{equipo: Equipo, laboratoristaId: string}[]>([]);
+
+  const [detallesAgregados, setDetallesAgregados] = useState<{ equipo: Equipo, laboratoristaId: string }[]>([]);
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const eqs = await obtenerEquipos({ estado: 'Operativo' });
         setEquipos(eqs);
-        
-        const labs = Array.from(new Set(eqs.map(e => e.laboratorio).filter(Boolean)));
-        setLaboratoriosUnicos(labs);
+
+        const labs = Array.from(new Set(eqs.map((e: any) => e.ubicacion || e.laboratorio).filter(Boolean)));
+        setLaboratoriosUnicos(labs as string[]);
 
         const usersRes = await getUsuarios(1, 100);
         // El backend de Auth retorna el array en la propiedad 'datos'
-        const usersArray = usersRes.datos || usersRes.items || usersRes.data || usersRes; 
-        
+        const usersArray = usersRes.datos || usersRes.items || usersRes.data || usersRes;
+
         if (Array.isArray(usersArray)) {
-          const labsActivos = usersArray.filter((u: any) => 
+          const labsActivos = usersArray.filter((u: any) =>
             u.rol && u.rol.toUpperCase() === 'LABORATORISTA' && u.activo === true
           );
           setLaboratoristas(labsActivos);
@@ -48,7 +49,7 @@ export const NuevaOrdenPage: React.FC = () => {
 
   const agregarDetalle = () => {
     if (!equipoSeleccionado || !laboratoristaSeleccionado) return;
-    
+
     // Evitar duplicados
     if (detallesAgregados.some(d => d.equipo.id.toString() === equipoSeleccionado)) {
       alert("Este equipo ya ha sido agregado a la orden.");
@@ -86,41 +87,55 @@ export const NuevaOrdenPage: React.FC = () => {
 
     try {
       await crearOrdenMantenimiento(dto);
-      alert("Orden de mantenimiento creada con éxito.");
-      // Redirigir o limpiar formulario
+      setMensajeExito("Orden de mantenimiento creada con éxito.");
       setDetallesAgregados([]);
       setDescripcionGeneral('');
+      setTimeout(() => setMensajeExito(null), 5000);
     } catch (error) {
       console.error("Error al crear la orden:", error);
       alert("Ocurrió un error al crear la orden de mantenimiento.");
     }
   };
 
-  const equiposFiltrados = equipos.filter(e => 
-    (!laboratorioFiltro || e.laboratorio === laboratorioFiltro) &&
-    !detallesAgregados.some(d => d.equipo.id === e.id)
+  const equiposFiltrados = equipos.filter((e: any) => 
+    (!laboratorioFiltro || (e.ubicacion || e.laboratorio) === laboratorioFiltro) &&
+    !detallesAgregados.some(d => String(d.equipo.id) === String(e.id))
   );
 
   return (
-    <div className="container mx-auto p-4 bg-gray-50 min-h-screen">
+    <div className="container mx-auto p-4 bg-gray-50 min-h-screen relative">
+      {/* SUCCESS TOAST */}
+      {mensajeExito && (
+        <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-3 bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-lg">
+          <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          <div>
+            <h3 className="text-sm font-bold text-green-800">¡Éxito!</h3>
+            <p className="text-sm text-green-700">{mensajeExito}</p>
+          </div>
+          <button onClick={() => setMensajeExito(null)} className="ml-4 text-green-600 hover:text-green-800">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      )}
+
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Nueva Orden de Mantenimiento</h1>
-      
+
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Datos Generales</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ingreso</label>
-            <input 
-              type="date" 
-              value={fechaIngreso} 
+            <input
+              type="date"
+              value={fechaIngreso}
               onChange={(e) => setFechaIngreso(e.target.value)}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Mantenimiento</label>
-            <select 
-              value={tipoMantenimiento} 
+            <select
+              value={tipoMantenimiento}
               onChange={(e) => setTipoMantenimiento(e.target.value)}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             >
@@ -131,7 +146,7 @@ export const NuevaOrdenPage: React.FC = () => {
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción General (Opcional)</label>
-            <textarea 
+            <textarea
               value={descripcionGeneral}
               onChange={(e) => setDescripcionGeneral(e.target.value)}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -146,8 +161,8 @@ export const NuevaOrdenPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Filtrar por Ubicación/Laboratorio</label>
-            <select 
-              value={laboratorioFiltro} 
+            <select
+              value={laboratorioFiltro}
               onChange={(e) => setLaboratorioFiltro(e.target.value)}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             >
@@ -159,21 +174,21 @@ export const NuevaOrdenPage: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Equipo</label>
-            <select 
-              value={equipoSeleccionado} 
+            <select
+              value={equipoSeleccionado}
               onChange={(e) => setEquipoSeleccionado(e.target.value)}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Seleccione un equipo...</option>
-              {equiposFiltrados.map(eq => (
-                <option key={eq.id} value={eq.id.toString()}>{eq.numeroSerie} - {eq.modelo}</option>
+              {equiposFiltrados.map((eq: any) => (
+                <option key={eq.id} value={eq.id.toString()}>{eq.numeroSerie} - {eq.nombreModelo || eq.modelo}</option>
               ))}
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Laboratorista Asignado</label>
-            <select 
-              value={laboratoristaSeleccionado} 
+            <select
+              value={laboratoristaSeleccionado}
               onChange={(e) => setLaboratoristaSeleccionado(e.target.value)}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             >
@@ -184,8 +199,8 @@ export const NuevaOrdenPage: React.FC = () => {
             </select>
           </div>
           <div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={agregarDetalle}
               disabled={!equipoSeleccionado || !laboratoristaSeleccionado}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow disabled:opacity-50 transition-colors"
@@ -215,16 +230,16 @@ export const NuevaOrdenPage: React.FC = () => {
                   return (
                     <tr key={index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {detalle.equipo.numeroSerie} - {detalle.equipo.modelo}
+                        {detalle.equipo.numeroSerie} - {(detalle.equipo as any).nombreModelo || detalle.equipo.modelo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {detalle.equipo.laboratorio}
+                        {(detalle.equipo as any).ubicacion || detalle.equipo.laboratorio || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {lab ? `${lab.nombre} ${lab.apellido}` : 'Desconocido'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
+                        <button
                           onClick={() => eliminarDetalle(detalle.equipo.id.toString())}
                           className="text-red-600 hover:text-red-900 font-semibold"
                         >
@@ -241,7 +256,7 @@ export const NuevaOrdenPage: React.FC = () => {
       )}
 
       <div className="flex justify-end">
-        <button 
+        <button
           onClick={handleSubmit}
           disabled={detallesAgregados.length === 0}
           className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md disabled:opacity-50 transform hover:scale-105 transition-all"
