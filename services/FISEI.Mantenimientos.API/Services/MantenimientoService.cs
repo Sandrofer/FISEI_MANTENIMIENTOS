@@ -16,7 +16,7 @@ namespace FISEI.Mantenimientos.API.Services
             _dbContext = dbContext;
         }
 
-        public async Task<CasosMantenimiento> CrearOrdenAsync(CrearOrdenRequestDto request, Guid usuarioId)
+        public async Task<CasosMantenimiento> CrearOrdenAsync(CrearOrdenRequestDto request, int usuarioId)
         {
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try

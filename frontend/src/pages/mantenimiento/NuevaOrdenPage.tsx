@@ -80,7 +80,7 @@ export const NuevaOrdenPage: React.FC = () => {
       tipoMantenimiento,
       equipos: detallesAgregados.map(d => ({
         equipoId: d.equipo.id.toString(),
-        laboratoristaAsignadoId: d.laboratoristaId
+        laboratoristaAsignadoId: Number(d.laboratoristaId)
       }))
     };
 

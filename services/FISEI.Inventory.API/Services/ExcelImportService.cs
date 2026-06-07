@@ -66,8 +66,7 @@ public class ExcelImportService
 
     public async Task<ImportacionEquiposResponseDto> ImportarAsync(
         IFormFile archivo,
-        Guid usuarioId,
-        int responsableId,
+        int usuarioId,
         bool importacionParcial,
         bool autoCrear,
         CancellationToken cancellationToken = default)
@@ -208,7 +207,7 @@ public class ExcelImportService
                 MarcaId = marcasDict[NormalizeString(fila.Marca)],
                 UbicacionId = ubicacionesDict[NormalizeString(fila.Ubicacion)],
                 Estado = NormalizarEstado(fila.Estado),
-                ResponsableId = responsableId,
+                ResponsableId = usuarioId,
                 EspecificacionesTecnicas = "{}",
                 FechaRegistro = DateTime.UtcNow,
                 LoteImportacionId = lote.Id

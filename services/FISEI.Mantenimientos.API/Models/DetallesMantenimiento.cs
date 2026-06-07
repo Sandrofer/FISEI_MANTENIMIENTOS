@@ -11,7 +11,7 @@ public partial class DetallesMantenimiento
 
     public Guid EquipoId { get; set; }
 
-    public Guid LaboratoristaAsignadoId { get; set; }
+    public int LaboratoristaAsignadoId { get; set; }
 
     public string EstadoIndividual { get; set; } = null!;
 

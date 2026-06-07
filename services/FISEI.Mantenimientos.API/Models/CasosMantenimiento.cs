@@ -13,7 +13,7 @@ public partial class CasosMantenimiento
 
     public DateTime FechaIngreso { get; set; }
 
-    public Guid CreadoPorUsuarioId { get; set; }
+    public int CreadoPorUsuarioId { get; set; }
 
     public DateTime? FechaRegistro { get; set; }
 

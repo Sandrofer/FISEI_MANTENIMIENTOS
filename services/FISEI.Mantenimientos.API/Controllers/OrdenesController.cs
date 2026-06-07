@@ -32,7 +32,7 @@ namespace FISEI.Mantenimientos.API.Controllers
             try
             {
                 var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid usuarioId))
+                if (!int.TryParse(userIdString, out int usuarioId) || usuarioId <= 0)
                 {
                     return Unauthorized("Token inválido o falta ID de usuario");
                 }

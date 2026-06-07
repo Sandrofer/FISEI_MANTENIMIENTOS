@@ -105,7 +105,7 @@ export const cancelarMantenimiento = async (id: number): Promise<void> => {
 
 export interface DetalleEquipoRequestDto {
   equipoId: string;
-  laboratoristaAsignadoId: string;
+  laboratoristaAsignadoId: number;
 }
 
 export interface CrearOrdenRequestDto {
@@ -114,7 +114,7 @@ export interface CrearOrdenRequestDto {
   tipoMantenimiento: string;
   equipos: {
     equipoId: string;
-    laboratoristaAsignadoId: string;
+    laboratoristaAsignadoId: number;
   }[];
 }
 

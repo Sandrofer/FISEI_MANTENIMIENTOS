@@ -200,7 +200,22 @@ export const ImportarEquipos = () => {
 
       {resultadoFinal && !resultadoFinal.success && (
          <div className="alert alert--error mb-20">
-           No se pudo importar el archivo debido a errores de validación y la importación parcial estaba desactivada.
+           <strong>No se pudo importar el archivo.</strong>
+           {resultadoFinal.errores && resultadoFinal.errores.length > 0 ? (
+             <div style={{ marginTop: '10px' }}>
+               <p style={{ margin: '0 0 8px 0' }}>Errores encontrados por el servidor:</p>
+               <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                 {resultadoFinal.errores.map((err, i) => (
+                   <li key={i}>
+                     {err.fila > 0 && <><strong>Fila {err.fila}</strong> — </>}
+                     <strong>{err.campo}:</strong> {err.mensaje}
+                   </li>
+                 ))}
+               </ul>
+             </div>
+           ) : (
+             <p style={{ margin: '5px 0 0 0' }}>La importación parcial estaba desactivada y se encontraron errores de validación.</p>
+           )}
          </div>
       )}
 

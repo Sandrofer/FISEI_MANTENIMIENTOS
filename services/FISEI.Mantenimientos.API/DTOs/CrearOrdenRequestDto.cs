@@ -26,6 +26,6 @@ namespace FISEI.Mantenimientos.API.DTOs
         public Guid EquipoId { get; set; }
 
         [Required]
-        public Guid LaboratoristaAsignadoId { get; set; }
+        public int LaboratoristaAsignadoId { get; set; }
     }
 }
