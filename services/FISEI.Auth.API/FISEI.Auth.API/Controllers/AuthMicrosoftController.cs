@@ -32,7 +32,7 @@ public class AuthMicrosoftController : ControllerBase
 
     [HttpGet("login")]
     [AllowAnonymous]
-    public IActionResult Login()
+    public IActionResult Login([FromQuery] string? prompt = null)
     {
         var config = _configuration.GetSection("AzureAd");
         var clientId = config["ClientId"]!;
@@ -52,6 +52,11 @@ public class AuthMicrosoftController : ControllerBase
             $"&scope=openid%20profile%20email" +
             $"&state={Uri.EscapeDataString(state)}" +
             $"&nonce={Uri.EscapeDataString(nonce)}";
+
+        if (string.Equals(prompt, "login", StringComparison.OrdinalIgnoreCase))
+        {
+            authUrl += "&prompt=login";
+        }
 
         return Redirect(authUrl);
     }

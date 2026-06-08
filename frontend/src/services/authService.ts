@@ -4,8 +4,19 @@ const AUTH_URL = import.meta.env.VITE_AUTH_URL ?? 'http://localhost:5260';
 const STORAGE_TOKEN_KEY = 'fisei_token';
 const STORAGE_NAME_KEY = 'fisei_nombre';
 const STORAGE_ROLE_KEY = 'fisei_rol';
+export const FORCE_REAUTH_STORAGE_KEY = 'fisei_force_reauth';
 
-export const authLoginUrl = `${AUTH_URL}/api/auth/microsoft/login`;
+export const getAuthLoginUrl = (forceReauth = false): string => {
+  const url = new URL(`${AUTH_URL}/api/auth/microsoft/login`);
+
+  if (forceReauth) {
+    url.searchParams.set('prompt', 'login');
+  }
+
+  return url.toString();
+};
+
+export const authLoginUrl = getAuthLoginUrl();
 
 export const handleMicrosoftCallback = async (): Promise<LoginResponse> => {
   const params = new URLSearchParams(window.location.search);

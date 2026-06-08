@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import portadaUrl from '../../assets/portada.png';
+import { FORCE_REAUTH_STORAGE_KEY } from '../../services/authService';
 
 const STORAGE_TOKEN_KEY = 'fisei_token';
 const STORAGE_NAME_KEY = 'fisei_nombre';
@@ -39,6 +41,7 @@ export const MicrosoftCallbackPage = () => {
       localStorage.setItem(STORAGE_TOKEN_KEY, token);
       localStorage.setItem(STORAGE_NAME_KEY, fullName);
       localStorage.setItem(STORAGE_ROLE_KEY, role);
+      localStorage.removeItem(FORCE_REAUTH_STORAGE_KEY);
 
       if (role === 'Administrador') {
         window.location.replace('/admin');
@@ -57,20 +60,28 @@ export const MicrosoftCallbackPage = () => {
   }, []);
 
   return (
-    <main className="login-page">
-      <section className="login-card login-card--status" aria-label="Autenticacion Microsoft">
-        <div className="login-brand">
-          <span className="login-brand__mark">FI</span>
-          <h1>FISEI</h1>
-          <p>{error ? 'No pudimos completar el acceso' : 'Autenticando con Microsoft...'}</p>
+    <main
+      className="institutional-login-page"
+      style={{
+        backgroundImage: `url(${portadaUrl})`,
+      }}
+    >
+      <section className="institutional-login-card institutional-login-card--status" aria-label="Autenticacion Microsoft">
+        <div className="institutional-login-brand">
+          <span className="institutional-login-mark" aria-hidden="true">F</span>
+          <div>
+            <span>FISEI</span>
+            <small>Mantenimientos</small>
+          </div>
         </div>
+
+        <h1>{error ? 'Acceso no autorizado' : 'Autenticando con Microsoft'}</h1>
 
         {error ? (
           <div className="auth-result auth-result--error">
             <span className="auth-result__icon">!</span>
-            <h2>Acceso no autorizado</h2>
             <p>{error}</p>
-            <Link to="/login" className="btn btn--primary btn--full">
+            <Link to="/login" className="institutional-microsoft-button institutional-microsoft-button--solid">
               Volver al inicio de sesion
             </Link>
           </div>

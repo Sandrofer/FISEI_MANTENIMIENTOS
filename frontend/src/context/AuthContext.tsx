@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LoginResponse } from '../types/auth';
 import { signalRService } from '../services/signalRService';
+import { FORCE_REAUTH_STORAGE_KEY } from '../services/authService';
 
 const STORAGE_TOKEN_KEY = 'fisei_token';
 const STORAGE_NAME_KEY = 'fisei_nombre';
@@ -56,6 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem(STORAGE_TOKEN_KEY);
     localStorage.removeItem(STORAGE_NAME_KEY);
     localStorage.removeItem(STORAGE_ROLE_KEY);
+    localStorage.setItem(FORCE_REAUTH_STORAGE_KEY, '1');
     signalRService.desconectar().catch((error) => {
       console.error('No se pudo desconectar SignalR de notificaciones', error);
     });
