@@ -65,6 +65,25 @@ namespace FISEI.Mantenimientos.API.Controllers
             }
         }
 
+        [HttpPost("{ordenId}/detalle/{detalleId}/resolver")]
+        public async Task<IActionResult> ResolverDetalle(Guid ordenId, Guid detalleId, [FromBody] ResolverDetalleDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var detalleActualizado = await _mantenimientoService.ResolverDetalleAsync(ordenId, detalleId, request);
+                return Ok(detalleActualizado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Mensaje = ex.ToString() });
+            }
+        }
+
         [HttpPatch("{id}/cerrar")]
         public async Task<IActionResult> CerrarOrden(Guid id)
         {

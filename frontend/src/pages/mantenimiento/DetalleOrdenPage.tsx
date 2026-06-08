@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { obtenerOrdenPorId, actualizarEstadoDetalle } from '../../services/mantenimientoService';
 import { obtenerEquipos } from '../../services/inventarioService';
 import { getUsuarios } from '../../services/usuarioService';
 import { useAuth } from '../../context/AuthContext';
+import { ResolverModal } from './ResolverModal';
 
 interface DetalleOrdenPageProps {
   ordenId: string;
@@ -19,7 +20,9 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
   
-  const navigate = useNavigate();
+  const [modalResolverAbierto, setModalResolverAbierto] = useState(false);
+  const [detalleAResolver, setDetalleAResolver] = useState<{detalleId: string, equipoId: string, categoriaEquipo: string} | null>(null);
+  
   const { usuario } = useAuth();
   
   // States for lookup data
@@ -64,6 +67,14 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
       return equipo.nombreModelo || equipo.modelo || `Equipo ${equipo.numeroSerie || ''}`.trim();
     }
     return equipoId.substring(0, 8);
+  };
+
+  const getCategoriaEquipo = (equipoId: string) => {
+    const equipo = equipos.find(e => String(e.id) === String(equipoId));
+    if (equipo && equipo.categoria) {
+      return equipo.categoria;
+    }
+    return 'Cómputo'; // fallback default
   };
 
   const getNombreUsuario = (usuarioId: number) => {
@@ -424,7 +435,14 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                   <td className="px-8 py-4">
                     {usuario?.rol === 'Laboratorista' && detalle.laboratoristaAsignadoId === usuario?.userId && detalle.estadoIndividual !== 'Finalizado' && detalle.estadoIndividual !== 'No Reparado (De Baja)' && (
                       <button
-                        onClick={() => navigate(`/mantenimientos/resolver/${detalle.id}`)}
+                        onClick={() => {
+                          setDetalleAResolver({
+                            detalleId: detalle.id,
+                            equipoId: detalle.equipoId,
+                            categoriaEquipo: getCategoriaEquipo(detalle.equipoId)
+                          });
+                          setModalResolverAbierto(true);
+                        }}
                         className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium shadow-md transition-all text-xs flex items-center gap-2"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
@@ -449,6 +467,21 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
           </table>
         </div>
       </div>
+
+      {/* RESOLVER MODAL */}
+      {modalResolverAbierto && detalleAResolver && (
+        <ResolverModal
+          ordenId={ordenId}
+          detalleId={detalleAResolver.detalleId}
+          categoriaEquipo={detalleAResolver.categoriaEquipo}
+          onClose={() => setModalResolverAbierto(false)}
+          onSuccess={() => {
+            setModalResolverAbierto(false);
+            setMensajeExito("Mantenimiento resuelto correctamente.");
+            obtenerOrdenPorId(ordenId).then(setOrden);
+          }}
+        />
+      )}
     </div>
   );
 };

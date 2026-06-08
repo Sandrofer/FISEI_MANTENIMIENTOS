@@ -45,6 +45,7 @@ export interface EquipoResponse {
   estado: string;
   fechaRegistro: string;
   mantenimientos: MantenimientoResponse[];
+  categoria: string;
 }
 
 export interface Equipo {
@@ -57,11 +58,18 @@ export interface Equipo {
   fechaCompra: string;
   estado: string;
   fechaRegistro: string;
+  categoria?: string;
 }
 
 export interface HojaVida {
   equipo: Equipo;
   mantenimientos: Mantenimiento[];
+}
+
+export interface RecursoSubcategoria {
+  id: number;
+  tipoPrincipal: string;
+  nombreSubcategoria: string;
 }
 
 export const registrarEquipo = async (dto: CrearEquipoDto): Promise<EquipoResponse> => {
@@ -93,4 +101,9 @@ export const actualizarEquipo = async (id: number, dto: ActualizarEquipoDto): Pr
 
 export const eliminarEquipo = async (id: number): Promise<void> => {
   await axios.delete(`${BASE_URL}/equipos/${id}`);
+};
+
+export const obtenerSubcategoriasRecursos = async (tipoPrincipal: string): Promise<RecursoSubcategoria[]> => {
+  const response = await axios.get<RecursoSubcategoria[]>(`${BASE_URL}/recursos/subcategorias/${tipoPrincipal}`);
+  return response.data;
 };

@@ -13,6 +13,8 @@ public class InventoryDbContext : DbContext
     public DbSet<Marca> Marcas => Set<Marca>();
     public DbSet<Ubicacion> Ubicaciones => Set<Ubicacion>();
     public DbSet<LoteImportacion> LotesImportacion => Set<LoteImportacion>();
+    public DbSet<RecursoSubcategoria> RecursoSubcategorias => Set<RecursoSubcategoria>();
+    public DbSet<RepuestoAlmacen> RepuestosAlmacen => Set<RepuestoAlmacen>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -92,6 +94,31 @@ public class InventoryDbContext : DbContext
                 .WithMany(l => l.Equipos)
                 .HasForeignKey(e => e.LoteImportacionId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<RecursoSubcategoria>(entity =>
+        {
+            entity.ToTable("recursos_subcategorias");
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Id).HasColumnName("id");
+            entity.Property(r => r.TipoPrincipal).HasColumnName("tipo_principal").HasMaxLength(50).IsRequired();
+            entity.Property(r => r.NombreSubcategoria).HasColumnName("nombre_subcategoria").HasMaxLength(100).IsRequired();
+        });
+
+        modelBuilder.Entity<RepuestoAlmacen>(entity =>
+        {
+            entity.ToTable("repuestos_almacen");
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Id).HasColumnName("id");
+            entity.Property(r => r.RecursoSubcategoriaId).HasColumnName("recurso_subcategoria_id").IsRequired();
+            entity.Property(r => r.NombreEspecifico).HasColumnName("nombre_especifico").HasMaxLength(150).IsRequired();
+            entity.Property(r => r.StockActual).HasColumnName("stock_actual").IsRequired();
+            entity.Property(r => r.StockMinimo).HasColumnName("stock_minimo").IsRequired();
+
+            entity.HasOne(r => r.RecursoSubcategoria)
+                .WithMany()
+                .HasForeignKey(r => r.RecursoSubcategoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

@@ -150,3 +150,46 @@ export const actualizarEstadoDetalle = async (ordenId: string, detalleId: string
   );
   return res.data;
 };
+
+// --- ENDPOINTS CATALOGOS Y RESOLUCION ---
+
+export interface DiagnosticoPredefinido {
+  id: number;
+  codigo: string;
+  descripcion: string;
+  categoriaEquipo: string;
+}
+
+export interface AccionPredefinida {
+  id: number;
+  nombre: string;
+  categoriaEquipo: string;
+}
+
+export interface RecursoUtilizadoDto {
+  tipoRecursoPrincipal: string;
+  recursoSubcategoriaId?: number;
+  cantidadUtilizada: number;
+}
+
+export interface ResolverDetalleDto {
+  diagnosticoPredefinidoId: number;
+  descripcionDetallada: string;
+  accionesIds: number[];
+  recursos: RecursoUtilizadoDto[];
+}
+
+export const obtenerDiagnosticosPorCategoria = async (categoria: string): Promise<DiagnosticoPredefinido[]> => {
+  const res = await axios.get(`${API_URL}/catalogos/diagnosticos/${categoria}`, getHeaders());
+  return res.data;
+};
+
+export const obtenerAccionesPorCategoria = async (categoria: string): Promise<AccionPredefinida[]> => {
+  const res = await axios.get(`${API_URL}/catalogos/acciones/${categoria}`, getHeaders());
+  return res.data;
+};
+
+export const resolverDetalleMantenimiento = async (ordenId: string, detalleId: string, dto: ResolverDetalleDto) => {
+  const res = await axios.post(`${API_URL}/ordenes/${ordenId}/detalle/${detalleId}/resolver`, dto, getHeaders());
+  return res.data;
+};
