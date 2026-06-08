@@ -41,10 +41,11 @@ public class InventarioService
         return await MapEquipoAsync(equipo.Id) ?? throw new InvalidOperationException("No se pudo recuperar el equipo.");
     }
 
-    public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync(string? estado = null)
+    public async Task<List<EquipoResponseDto>> ObtenerEquiposAsync(string? estado = null, string? procesador = null)
     {
         var query = _context.Equipos.AsNoTracking().Include(e => e.Categoria).Include(e => e.Marca).Include(e => e.Ubicacion).AsQueryable();
         if (!string.IsNullOrWhiteSpace(estado)) query = query.Where(e => e.Estado == estado);
+        if (!string.IsNullOrWhiteSpace(procesador)) query = query.Where(e => e.EspecificacionesTecnicas.Contains(procesador));
         return await query.OrderByDescending(e => e.FechaRegistro).Select(e => ToDto(e)).ToListAsync();
     }
 

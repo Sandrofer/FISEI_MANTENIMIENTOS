@@ -54,7 +54,8 @@ public class InventarioController : ControllerBase
     }
 
     [HttpGet("equipos")]
-    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos([FromQuery] string? estado) => Ok(await _service.ObtenerEquiposAsync(estado));
+    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos([FromQuery] string? estado, [FromQuery] string? procesador)
+        => Ok(await _service.ObtenerEquiposAsync(estado, procesador));
 
     [HttpGet("equipos/{id:guid}/hoja-vida")]
     public async Task<IActionResult> ObtenerHojaVidaEquipo(Guid id)

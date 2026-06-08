@@ -38,30 +38,39 @@ export interface Mantenimiento {
 }
 
 export interface EquipoResponse {
-  id: number;
+  id: string;
+  codigoInventario: string;
   numeroSerie: string;
-  marca: string;
-  modelo: string;
-  procesador: string;
-  laboratorio: string;
-  fechaCompra: string;
-  estado: string;
-  fechaRegistro: string;
-  mantenimientos: MantenimientoResponse[];
+  nombreModelo: string;
+  categoriaId: number;
   categoria: string;
+  marcaId: number;
+  marca: string;
+  ubicacionId: number;
+  ubicacion: string;
+  estado: string;
+  responsableId: number;
+  especificacionesTecnicas: string;
+  fechaRegistro: string;
+  loteImportacionId: string | null;
 }
 
 export interface Equipo {
-  id: number;
+  id: string;
+  codigoInventario: string;
   numeroSerie: string;
+  nombreModelo: string;
+  categoriaId: number;
+  categoria: string;
+  marcaId: number;
   marca: string;
-  modelo: string;
-  procesador: string;
-  laboratorio: string;
-  fechaCompra: string;
+  ubicacionId: number;
+  ubicacion: string;
   estado: string;
+  responsableId: number;
+  especificacionesTecnicas: string;
   fechaRegistro: string;
-  categoria?: string;
+  loteImportacionId: string | null;
 }
 
 export interface HojaVida {
@@ -92,17 +101,17 @@ export const obtenerEquipos = async (filtros?: FiltrosEquipo): Promise<Equipo[]>
   return response.data;
 };
 
-export const getHojaVidaEquipo = async (id: number): Promise<HojaVida> => {
+export const getHojaVidaEquipo = async (id: string): Promise<HojaVida> => {
   const response = await axios.get<HojaVida>(`${BASE_URL}/equipos/${id}/hoja-vida`);
   return response.data;
 };
 
-export const actualizarEquipo = async (id: number, dto: ActualizarEquipoDto): Promise<Equipo> => {
+export const actualizarEquipo = async (id: string, dto: ActualizarEquipoDto): Promise<Equipo> => {
   const response = await axios.put<Equipo>(`${BASE_URL}/equipos/${id}`, dto);
   return response.data;
 };
 
-export const eliminarEquipo = async (id: number): Promise<void> => {
+export const eliminarEquipo = async (id: string): Promise<void> => {
   await axios.delete(`${BASE_URL}/equipos/${id}`);
 };
 

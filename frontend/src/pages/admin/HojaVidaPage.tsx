@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { getHojaVidaEquipo } from '../../services/inventarioService';
-import type { HojaVida, Mantenimiento } from '../../services/inventarioService';
+import type { HojaVida, Mantenimiento, Equipo} from '../../services/inventarioService';
 
 export const HojaVidaPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,20 +10,14 @@ export const HojaVidaPage = () => {
   const location = useLocation();
   const panelPath = location.pathname.startsWith('/lab') ? '/lab' : '/admin';
 
-  // Estados existentes — NO eliminar
   const [hojaVida, setHojaVida] = useState<HojaVida | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Nuevo estado para filtro
   const [filtroTipo, setFiltroTipo] = useState('Todos');
 
-  // Lógica de carga existente — NO modificar
   useEffect(() => {
     const cargarHojaVida = async () => {
-      const equipoId = Number(id);
-
-      if (!id || Number.isNaN(equipoId)) {
+      if (!id || id === 'undefined') {
         setError('Identificador de equipo invalido.');
         setLoading(false);
         return;
@@ -32,7 +26,7 @@ export const HojaVidaPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await getHojaVidaEquipo(equipoId);
+        const data = await getHojaVidaEquipo(id);
         setHojaVida(data);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
@@ -49,7 +43,6 @@ export const HojaVidaPage = () => {
     cargarHojaVida();
   }, [id]);
 
-  // Formateo de fecha existente — NO modificar
   const formatDate = (value: string | null | undefined): string => {
     if (!value) return '';
     try {
@@ -88,14 +81,13 @@ export const HojaVidaPage = () => {
     );
   }
 
-  const { equipo, mantenimientos } = hojaVida;
+  const equipo = hojaVida as unknown as Equipo;
+const mantenimientos: Mantenimiento[] = [];
 
-  // Filtrado en cliente
   const mantenimientosFiltrados = filtroTipo === 'Todos'
     ? mantenimientos ?? []
     : (mantenimientos ?? []).filter(m => m.tipo === filtroTipo);
 
-  // Card de Mantenimiento Interno
   const CardMantenimiento = ({ m }: { m: Mantenimiento }) => {
     const lineas = m.accionesRealizadas 
       ? m.accionesRealizadas.includes('\n') 
@@ -106,7 +98,6 @@ export const HojaVidaPage = () => {
 
     return (
       <article className="timeline-item" style={{ maxWidth: '420px', width: '100%', textAlign: 'left' }}>
-        {/* Header */}
         <div className="timeline-item__header" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <svg style={{ width: '14px', height: '14px', color: 'var(--color-primary)', marginRight: '6px', flexShrink: 0 }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -120,16 +111,13 @@ export const HojaVidaPage = () => {
                 {m.tipo}
               </span>
             )}
-            <span 
-              className={`badge ${m.estado === 'Completado' ? 'badge--success' : (m.estado === 'Pendiente' || m.estado === 'Cancelado') ? 'badge--neutral' : ''}`}
-              style={m.estado === 'EnProceso' ? { backgroundColor: '#fef08a', color: '#854d0e', border: '1px solid #fef08a' } : undefined}
-            >
+            <span className={`badge ${m.estado === 'Completado' ? 'badge--success' : (m.estado === 'Pendiente' || m.estado === 'Cancelado') ? 'badge--neutral' : ''}`}
+              style={m.estado === 'EnProceso' ? { backgroundColor: '#fef08a', color: '#854d0e', border: '1px solid #fef08a' } : undefined}>
               {m.estado}
             </span>
           </div>
         </div>
 
-        {/* Detalles */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {m.responsable && (
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
@@ -178,7 +166,6 @@ export const HojaVidaPage = () => {
   return (
     <main className="resource-page">
       <div className="resource-container">
-        {/* Sección 1 — Header de página */}
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
           <div>
             <Link to={panelPath} className="back-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
@@ -198,7 +185,6 @@ export const HojaVidaPage = () => {
           </div>
         </div>
 
-        {/* Sección 2 — Tarjeta "INFORMACIÓN DEL EQUIPO" */}
         <section className="card card--padded mb-20">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <svg style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -227,7 +213,7 @@ export const HojaVidaPage = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 3v2m6-2v2M9 19H5a2 2 0 000 4h14a2 2 0 000-4h-4M9 5h6m-6 0v10.428a4 4 0 01-1.101 2.766L5 21h14l-2.899-2.806A4 4 0 0115 15.427V5H9z" />
               </svg>
               <p className="info-item__label" style={{ margin: '0 0 4px 0' }}>Laboratorio</p>
-              <p className="info-item__value" style={{ margin: 0, fontWeight: 'bold' }}>{equipo.laboratorio}</p>
+              <p className="info-item__value" style={{ margin: 0, fontWeight: 'bold' }}>{equipo.ubicacion}</p>
             </div>
             <div className="info-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '10px' }}>
               <svg style={{ width: '24px', height: '24px', color: '#16a34a', marginBottom: '8px' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -241,7 +227,6 @@ export const HojaVidaPage = () => {
           </div>
         </section>
 
-        {/* Sección 3 — Filtro por tipo */}
         <section className="card card--padded mb-20" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <svg style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -261,9 +246,7 @@ export const HojaVidaPage = () => {
           </select>
         </section>
 
-        {/* Sección 4 — Timeline de mantenimientos */}
         {mantenimientosFiltrados.length === 0 ? (
-          /* Sección 6 — Estado vacío */
           <div className="empty-panel" style={{ display: 'flex', flexDirection: 'row', gap: '12px', alignItems: 'flex-start', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 'var(--radius-md)', padding: '24px', textAlign: 'left', width: '100%' }}>
             <svg style={{ width: '24px', height: '24px', color: 'var(--color-primary)', flexShrink: 0, marginTop: '2px' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -279,17 +262,14 @@ export const HojaVidaPage = () => {
               const esIzquierda = index % 2 === 0;
               return (
                 <React.Fragment key={m.id}>
-                  {/* columna izquierda */}
                   <div style={{ gridColumn: '1', display: 'flex', justifyContent: 'flex-end' }}>
                     {esIzquierda && <CardMantenimiento m={m} />}
                   </div>
-                  {/* columna central: línea + nodo */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ flex: 1, width: 2, background: 'var(--color-border)' }} />
                     <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--color-primary)', flexShrink: 0 }} />
                     <div style={{ flex: 1, width: 2, background: 'var(--color-border)' }} />
                   </div>
-                  {/* columna derecha */}
                   <div style={{ gridColumn: '3' }}>
                     {!esIzquierda && <CardMantenimiento m={m} />}
                   </div>
