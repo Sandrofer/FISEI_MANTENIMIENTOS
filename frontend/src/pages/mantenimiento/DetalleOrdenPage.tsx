@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { obtenerOrdenPorId, actualizarEstadoDetalle } from '../../services/mantenimientoService';
 import { obtenerEquipos } from '../../services/inventarioService';
 import { getUsuarios } from '../../services/usuarioService';
+import { useAuth } from '../../context/AuthContext';
 
 interface DetalleOrdenPageProps {
   ordenId: string;
@@ -16,6 +18,9 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
   const [mostrarConfirmacionCierre, setMostrarConfirmacionCierre] = useState(false);
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
+  
+  const navigate = useNavigate();
+  const { usuario } = useAuth();
   
   // States for lookup data
   const [equipos, setEquipos] = useState<any[]>([]);
@@ -346,6 +351,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                 <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Técnico Asignado</th>
                 <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Inicio / Fin</th>
                 <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Estado Técnico</th>
+                <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 bg-white">
@@ -415,12 +421,23 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                       </span>
                     </div>
                   </td>
+                  <td className="px-8 py-4">
+                    {usuario?.rol === 'Laboratorista' && detalle.laboratoristaAsignadoId === usuario?.userId && detalle.estadoIndividual !== 'Finalizado' && detalle.estadoIndividual !== 'No Reparado (De Baja)' && (
+                      <button
+                        onClick={() => navigate(`/mantenimientos/resolver/${detalle.id}`)}
+                        className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium shadow-md transition-all text-xs flex items-center gap-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                        Resolver
+                      </button>
+                    )}
+                  </td>
                 </tr>
                 );
               })}
               {(!orden.detallesMantenimientos || orden.detallesMantenimientos.length === 0) && (
                 <tr>
-                  <td colSpan={4} className="px-8 py-10 text-center">
+                  <td colSpan={5} className="px-8 py-10 text-center">
                     <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                       <svg className="w-10 h-10 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                       <span className="font-medium text-sm">No hay equipos asignados a esta orden.</span>

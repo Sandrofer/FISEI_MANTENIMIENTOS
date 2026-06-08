@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { obtenerTodasLasOrdenes } from '../../services/mantenimientoService';
+import { useAuth } from '../../context/AuthContext';
 
 interface MantenimientosPageProps {
   onNuevoClick: () => void;
@@ -11,13 +12,22 @@ export const MantenimientosPage = ({ onNuevoClick, onVerDetalle, casoInicialCodi
   const [ordenes, setOrdenes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { usuario } = useAuth();
   const ultimoCasoAbiertoRef = useRef<string | null>(null);
 
   const cargarDatos = async () => {
     try {
       setLoading(true);
       const data = await obtenerTodasLasOrdenes();
-      setOrdenes(data);
+      
+      let filteredData = data;
+      if (usuario?.rol === 'Laboratorista') {
+        filteredData = data.filter((orden: any) => 
+          orden.detallesMantenimientos?.some((d: any) => d.laboratoristaAsignadoId === usuario?.userId)
+        );
+      }
+      
+      setOrdenes(filteredData);
     } catch (err: any) {
       console.error(err);
       setError('Error al cargar la lista de mantenimientos.');
@@ -28,7 +38,16 @@ export const MantenimientosPage = ({ onNuevoClick, onVerDetalle, casoInicialCodi
 
   useEffect(() => {
     cargarDatos();
-  }, []);
+
+    const onNotificacion = () => {
+      cargarDatos();
+    };
+
+    window.addEventListener('fisei:notificacion-recibida', onNotificacion);
+    return () => {
+      window.removeEventListener('fisei:notificacion-recibida', onNotificacion);
+    };
+  }, [usuario]);
 
   useEffect(() => {
     if (loading || !casoInicialCodigo || ultimoCasoAbiertoRef.current === casoInicialCodigo) {
