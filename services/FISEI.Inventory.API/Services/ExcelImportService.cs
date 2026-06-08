@@ -190,7 +190,7 @@ public class ExcelImportService
         {
             var lote = new LoteImportacion
             {
-                Id = Guid.NewGuid(),
+    
                 UsuarioId = usuarioId,
                 NombreArchivo = Path.GetFileName(archivo.FileName),
                 TotalRegistros = filas.Count,
@@ -199,7 +199,7 @@ public class ExcelImportService
 
             var equipos = filas.Select(fila => new Equipo
             {
-                Id = Guid.NewGuid(),
+                
                 CodigoInventario = fila.CodigoInventario,
                 NumeroSerie = fila.NumeroSerie,
                 NombreModelo = fila.NombreModelo,

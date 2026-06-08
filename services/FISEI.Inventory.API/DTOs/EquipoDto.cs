@@ -1,4 +1,4 @@
-namespace Inventory.API.DTOs;
+﻿namespace Inventory.API.DTOs;
 
 public class CrearEquipoDto
 {
@@ -32,10 +32,4 @@ public class EquipoResponseDto
     public Guid? LoteImportacionId { get; set; }
 }
 
-public class MantenimientoResponseDto
-{
-    public int Id { get; set; }
-    public DateOnly FechaProgramada { get; set; }
-    public string Estado { get; set; } = string.Empty;
-    public string? Observaciones { get; set; }
-}
+public class MantenimientoResponseDto { }

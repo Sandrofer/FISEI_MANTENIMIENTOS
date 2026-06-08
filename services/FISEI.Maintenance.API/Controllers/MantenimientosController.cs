@@ -7,7 +7,7 @@ namespace FISEI.Maintenance.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+
 public class MantenimientosController : ControllerBase
 {
     private readonly MaintenanceService _service;
@@ -18,7 +18,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> GetMantenimientos([FromQuery] string? estado, [FromQuery] string? laboratorio)
     {
         var result = await _service.ObtenerMantenimientosAsync(estado: estado, laboratorio: laboratorio);
@@ -26,7 +26,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpGet("equipo/{equipoId}")]
-    [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> GetPorEquipo(int equipoId)
     {
         var result = await _service.ObtenerMantenimientosAsync(equipoId: equipoId);
@@ -34,7 +34,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> GetPorId(int id)
     {
         var result = await _service.ObtenerMantenimientoPorIdAsync(id);
@@ -43,7 +43,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Administrador,Laboratorista")]
+    //[Authorize(Roles = "Administrador,Laboratorista")]
     public async Task<IActionResult> Crear(CrearMantenimientoDto dto)
     {
         try
@@ -58,7 +58,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpPut("{id}/reprogramar")]
-    [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> Reprogramar(int id, ReprogramarMantenimientoDto dto)
     {
         var success = await _service.ReprogramarMantenimientoAsync(id, dto);
@@ -67,7 +67,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Laboratorista,TÃ©cnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,TÃ©cnico,Tecnico")]
     public async Task<IActionResult> Actualizar(int id, ActualizarMantenimientoDto dto)
     {
         var success = await _service.ActualizarMantenimientoAsync(id, dto);
@@ -76,7 +76,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpPut("{id}/iniciar")]
-    [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> Iniciar(int id)
     {
         var success = await _service.IniciarMantenimientoAsync(id);
@@ -85,7 +85,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpPut("{id}/completar")]
-    [Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
+    //[Authorize(Roles = "Administrador,Laboratorista,Técnico,Tecnico")]
     public async Task<IActionResult> Completar(int id, CompletarMantenimientoDto dto)
     {
         var success = await _service.CompletarMantenimientoAsync(id, dto);
@@ -94,7 +94,7 @@ public class MantenimientosController : ControllerBase
     }
 
     [HttpPut("{id}/cancelar")]
-    [Authorize(Roles = "Administrador,Laboratorista")]
+    //[Authorize(Roles = "Administrador,Laboratorista")]
     public async Task<IActionResult> Cancelar(int id)
     {
         var success = await _service.CancelarMantenimientoAsync(id);

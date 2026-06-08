@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api'}/mantenimientos`;
+const API_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5082/api'}/mantenimientos`;
 
 const getHeaders = () => ({
   headers: { Authorization: `Bearer ${localStorage.getItem('fisei_token')}` }
@@ -128,7 +128,7 @@ export const crearOrdenMantenimiento = async (dto: CrearOrdenRequestDto) => {
 };
 
 export const obtenerTodasLasOrdenes = async () => {
-  const res = await axios.get(`${API_URL}/ordenes`, getHeaders());
+  const res = await axios.get(`${API_URL}`, getHeaders());
   return res.data;
 };
 

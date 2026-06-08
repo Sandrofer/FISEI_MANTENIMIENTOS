@@ -1,14 +1,17 @@
 import axios from 'axios';
 
-const BASE_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api'}/inventario`;
+const BASE_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5064/api'}/inventario`;
 
 export interface CrearEquipoDto {
+  codigoInventario: string;
   numeroSerie: string;
-  marca: string;
-  modelo: string;
-  procesador: string;
-  laboratorio: string;
-  fechaCompra: string;
+  nombreModelo: string;
+  categoriaId: number;
+  marcaId: number;
+  ubicacionId: number;
+  estado: string;
+  responsableId: number;
+  especificacionesTecnicas: string;
 }
 
 export interface ActualizarEquipoDto extends CrearEquipoDto {
