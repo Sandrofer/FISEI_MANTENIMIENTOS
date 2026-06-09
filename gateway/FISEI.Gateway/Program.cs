@@ -27,7 +27,8 @@ var routes = new Dictionary<string, Uri>(StringComparer.OrdinalIgnoreCase)
     ["api/auth"] = new(builder.Configuration["Services:Auth"] ?? "http://localhost:5260"),
     ["api/usuarios"] = new(builder.Configuration["Services:Auth"] ?? "http://localhost:5260"),
     ["api/inventario"] = new(builder.Configuration["Services:Inventory"] ?? "http://localhost:5064"),
-    ["api/mantenimientos"] = new(builder.Configuration["Services:Maintenance"] ?? "http://localhost:5085")
+    ["api/mantenimientos"] = new(builder.Configuration["Services:Maintenance"] ?? "http://localhost:5085"),
+    ["api/ia"] = new(builder.Configuration["Services:IA"] ?? "http://localhost:5090")
 };
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "FISEI.Gateway" }));
