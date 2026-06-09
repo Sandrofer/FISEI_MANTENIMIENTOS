@@ -116,7 +116,7 @@ namespace FISEI.Mantenimientos.API.Controllers
             var ordenes = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.Include(
                 dbContext.CasosMantenimientos,
                 c => c.DetallesMantenimientos)
-                .OrderByDescending(c => c.FechaIngreso)
+                .OrderByDescending(c => c.FechaRegistro)
                 .ToListAsync();
 
             return Ok(ordenes);

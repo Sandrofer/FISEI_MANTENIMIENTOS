@@ -23,6 +23,20 @@ namespace FISEI.Mantenimientos.API.Services
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
+                // Validación: Verificar que los equipos no estén ya en un mantenimiento activo
+                var equiposIds = request.Equipos.Select(e => e.EquipoId).ToList();
+                var equiposOcupados = await _dbContext.DetallesMantenimientos
+                    .Where(d => equiposIds.Contains(d.EquipoId) && 
+                                d.EstadoIndividual != "Finalizado" && 
+                                d.EstadoIndividual != "No Reparado (De Baja)")
+                    .Select(d => d.EquipoId)
+                    .ToListAsync();
+
+                if (equiposOcupados.Any())
+                {
+                    throw new Exception("Uno o más equipos seleccionados ya se encuentran en un proceso de mantenimiento activo.");
+                }
+
                 int anio = DateTime.Now.Year;
                 string prefijo = $"MANT-{anio}-";
                 
