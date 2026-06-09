@@ -19,12 +19,12 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
   const [mostrarConfirmacionCierre, setMostrarConfirmacionCierre] = useState(false);
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
-  
+
   const [modalResolverAbierto, setModalResolverAbierto] = useState(false);
-  const [detalleAResolver, setDetalleAResolver] = useState<{detalleId: string, equipoId: string, categoriaEquipo: string} | null>(null);
-  
+  const [detalleAResolver, setDetalleAResolver] = useState<{ detalleId: string, equipoId: string, categoriaEquipo: string } | null>(null);
+
   const { usuario } = useAuth();
-  
+
   // States for lookup data
   const [equipos, setEquipos] = useState<any[]>([]);
   const [usuarios, setUsuarios] = useState<any[]>([]);
@@ -39,7 +39,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
           obtenerEquipos().catch(() => []), // Fallback to empty array if fails
           getUsuarios(1, 1000).catch(() => ({ datos: [] }))
         ]);
-        
+
         setOrden(ordenData);
         setEquipos(equiposData);
         setUsuarios(usuariosData.datos || []);
@@ -88,7 +88,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
   const handleEstadoChange = async (detalleId: string, nuevoEstado: string) => {
     const detallesAnteriores = [...orden.detallesMantenimientos];
     const ordenActualizada = { ...orden };
-    
+
     const detalleIndex = ordenActualizada.detallesMantenimientos.findIndex((d: any) => d.id === detalleId);
     if (detalleIndex >= 0) {
       ordenActualizada.detallesMantenimientos[detalleIndex].estadoIndividual = nuevoEstado;
@@ -172,7 +172,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
           <svg className="w-12 h-12 mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           <p className="font-semibold text-lg">{error || 'Orden no encontrada'}</p>
           {onVolver && (
-             <button onClick={onVolver} className="mt-6 px-6 py-2.5 bg-white text-red-600 rounded-lg hover:bg-red-50 border border-red-200 font-medium transition-colors">Volver al listado</button>
+            <button onClick={onVolver} className="mt-6 px-6 py-2.5 bg-white text-red-600 rounded-lg hover:bg-red-50 border border-red-200 font-medium transition-colors">Volver al listado</button>
           )}
         </div>
       </div>
@@ -181,7 +181,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6 pb-20 animate-fade-in relative">
-      
+
       {/* SUCCESS TOAST */}
       {mensajeExito && (
         <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-3 bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-lg">
@@ -224,13 +224,13 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
-              <button 
+              <button
                 onClick={() => setMostrarConfirmacionCierre(false)}
                 className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={confirmarCierreOrden}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition-colors flex items-center gap-2"
               >
@@ -244,7 +244,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
       {/* ACTION BAR SUPERIOR */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         {onVolver && (
-          <button 
+          <button
             onClick={onVolver}
             className="group flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors font-semibold text-sm bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm hover:shadow"
           >
@@ -254,7 +254,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
         )}
 
         <div className="flex items-center gap-3">
-           {orden.estadoGeneral === 'Abierto' && (
+          {orden.estadoGeneral === 'Abierto' && (
             <button onClick={handleCerrarOrden} className="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 font-medium text-sm flex items-center gap-2 transition-all">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               Cerrar Orden
@@ -283,7 +283,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
               Registrado el {new Date(orden.fechaIngreso).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
             </div>
           </div>
-          
+
           <div className="flex flex-col items-start md:items-end gap-5 w-full md:w-auto">
             <div className="flex flex-col gap-1.5 items-start md:items-end w-full">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estado Actual</span>
@@ -296,7 +296,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
       {/* MAIN UNIFIED CONTENT CARD */}
       <div className="bg-white rounded-b-2xl shadow-sm border border-slate-200 p-6 md:p-10 mb-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10">
-          
+
           {/* COLUMNA IZQUIERDA */}
           <div className="space-y-10">
             {/* INFORMACION GENERAL */}
@@ -305,7 +305,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Información del Caso
               </h3>
-              
+
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -329,7 +329,7 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
                 Descripción General
               </h3>
-              
+
               {orden.descripcionGeneral ? (
                 <div className="bg-slate-50 border-l-4 border-slate-400 p-5 rounded-r-xl min-h-[100px]">
                   <p className="text-slate-700 leading-relaxed font-medium">
@@ -370,87 +370,87 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                 const equipoEnfocado = equipoEnfocadoId && String(detalle.equipoId) === String(equipoEnfocadoId);
 
                 return (
-                <tr
-                  id={`detalle-equipo-${detalle.equipoId}`}
-                  key={detalle.id}
-                  className={`${equipoEnfocado ? 'bg-red-50/80 ring-2 ring-inset ring-red-200' : 'hover:bg-slate-50/50'} transition-colors`}
-                >
-                  <td className="px-8 py-4">
-                    <span className={`text-sm font-bold font-mono px-2 py-1 rounded border ${equipoEnfocado ? 'bg-white text-red-800 border-red-200' : 'bg-slate-100 text-slate-800 border-slate-200'}`} title={`ID: ${detalle.equipoId}`}>
-                      {getNombreEquipo(detalle.equipoId)}
-                    </span>
-                    {equipoEnfocado && (
-                      <span className="ml-2 inline-flex rounded-full bg-red-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-red-800">
-                        Asignado
+                  <tr
+                    id={`detalle-equipo-${detalle.equipoId}`}
+                    key={detalle.id}
+                    className={`${equipoEnfocado ? 'bg-red-50/80 ring-2 ring-inset ring-red-200' : 'hover:bg-slate-50/50'} transition-colors`}
+                  >
+                    <td className="px-8 py-4">
+                      <span className={`text-sm font-bold font-mono px-2 py-1 rounded border ${equipoEnfocado ? 'bg-white text-red-800 border-red-200' : 'bg-slate-100 text-slate-800 border-slate-200'}`} title={`ID: ${detalle.equipoId}`}>
+                        {getNombreEquipo(detalle.equipoId)}
                       </span>
-                    )}
-                  </td>
-                  <td className="px-8 py-4">
-                    <span className="text-sm font-medium text-slate-600" title={`ID Usuario: ${detalle.laboratoristaAsignadoId}`}>
-                      {getNombreUsuario(detalle.laboratoristaAsignadoId)}
-                    </span>
-                  </td>
-                  <td className="px-8 py-4">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                        <span className="text-xs font-medium text-slate-500">Inicio: {detalle.fechaInicio ? new Date(detalle.fechaInicio).toLocaleDateString() : '-'}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-green-400"></span>
-                        <span className="text-xs font-medium text-slate-500">Fin: {detalle.fechaFin ? new Date(detalle.fechaFin).toLocaleDateString() : '-'}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-4">
-                    <div className="flex items-center gap-3">
-                      <select
-                        value={detalle.estadoIndividual}
-                        onChange={(e) => handleEstadoChange(detalle.id, e.target.value)}
-                        className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 bg-white hover:border-primary focus:ring-2 focus:ring-primary/20 outline-none shadow-sm cursor-pointer transition-all appearance-none pr-8 relative disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50"
-                        disabled={orden.estadoGeneral === 'Cerrado' || detalle.estadoIndividual === 'Finalizado' || detalle.estadoIndividual === 'No Reparado (De Baja)'}
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: `right 0.5rem center`,
-                          backgroundRepeat: `no-repeat`,
-                          backgroundSize: `1.5em 1.5em`
-                        }}
-                      >
-                        {estadosPermitidos.map((est) => {
-                          const idxActual = estadosPermitidos.indexOf(detalle.estadoIndividual);
-                          const idxOp = estadosPermitidos.indexOf(est);
-                          return (
-                            <option key={est} value={est} disabled={idxOp < idxActual}>
-                              {est}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border shadow-sm ${getStatusBadgeColor(detalle.estadoIndividual)}`}>
-                        {detalle.estadoIndividual}
+                      {equipoEnfocado && (
+                        <span className="ml-2 inline-flex rounded-full bg-red-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-red-800">
+                          Asignado
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-8 py-4">
+                      <span className="text-sm font-medium text-slate-600" title={`ID Usuario: ${detalle.laboratoristaAsignadoId}`}>
+                        {getNombreUsuario(detalle.laboratoristaAsignadoId)}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-4">
-                    {usuario?.rol === 'Laboratorista' && detalle.laboratoristaAsignadoId === usuario?.userId && detalle.estadoIndividual !== 'Finalizado' && detalle.estadoIndividual !== 'No Reparado (De Baja)' && (
-                      <button
-                        onClick={() => {
-                          setDetalleAResolver({
-                            detalleId: detalle.id,
-                            equipoId: detalle.equipoId,
-                            categoriaEquipo: getCategoriaEquipo(detalle.equipoId)
-                          });
-                          setModalResolverAbierto(true);
-                        }}
-                        className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium shadow-md transition-all text-xs flex items-center gap-2"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
-                        Resolver
-                      </button>
-                    )}
-                  </td>
-                </tr>
+                    </td>
+                    <td className="px-8 py-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                          <span className="text-xs font-medium text-slate-500">Inicio: {detalle.fechaInicio ? new Date(detalle.fechaInicio).toLocaleDateString() : '-'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                          <span className="text-xs font-medium text-slate-500">Fin: {detalle.fechaFin ? new Date(detalle.fechaFin).toLocaleDateString() : '-'}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-4">
+                      <div className="flex items-center gap-3">
+                        <select
+                          value={detalle.estadoIndividual}
+                          onChange={(e) => handleEstadoChange(detalle.id, e.target.value)}
+                          className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 bg-white hover:border-primary focus:ring-2 focus:ring-primary/20 outline-none shadow-sm cursor-pointer transition-all appearance-none pr-8 relative disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50"
+                          disabled={orden.estadoGeneral === 'Cerrado' || detalle.estadoIndividual === 'Finalizado' || detalle.estadoIndividual === 'No Reparado (De Baja)'}
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: `right 0.5rem center`,
+                            backgroundRepeat: `no-repeat`,
+                            backgroundSize: `1.5em 1.5em`
+                          }}
+                        >
+                          {estadosPermitidos.map((est) => {
+                            const idxActual = estadosPermitidos.indexOf(detalle.estadoIndividual);
+                            const idxOp = estadosPermitidos.indexOf(est);
+                            return (
+                              <option key={est} value={est} disabled={idxOp < idxActual}>
+                                {est}
+                              </option>
+                            );
+                          })}
+                        </select>
+
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border shadow-sm ${getStatusBadgeColor(detalle.estadoIndividual)}`}>
+                          {detalle.estadoIndividual}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-4">
+                      {usuario?.rol === 'Laboratorista' && detalle.laboratoristaAsignadoId === usuario?.userId && detalle.estadoIndividual !== 'Finalizado' && detalle.estadoIndividual !== 'No Reparado (De Baja)' && (
+                        <button
+                          onClick={() => {
+                            setDetalleAResolver({
+                              detalleId: detalle.id,
+                              equipoId: detalle.equipoId,
+                              categoriaEquipo: getCategoriaEquipo(detalle.equipoId)
+                            });
+                            setModalResolverAbierto(true);
+                          }}
+                          className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium shadow-md transition-all text-xs flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                          Resolver
+                        </button>
+                      )}
+                    </td>
+                  </tr>
                 );
               })}
               {(!orden.detallesMantenimientos || orden.detallesMantenimientos.length === 0) && (

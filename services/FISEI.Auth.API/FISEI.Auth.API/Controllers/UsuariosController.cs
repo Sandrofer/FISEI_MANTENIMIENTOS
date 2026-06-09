@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using FISEI.Auth.API.Data;
 using FISEI.Auth.API.DTOs;
 using FISEI.Auth.API.Models;
@@ -59,7 +58,7 @@ public class UsuariosController : ControllerBase
             Nombre = dto.Nombre.Trim(),
             Apellido = dto.Apellido.Trim(),
             Correo = correoNormalizado,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            PasswordHash = "MICROSOFT_AUTH_ONLY",
             Rol = dto.Rol
         };
 
@@ -90,18 +89,6 @@ public class UsuariosController : ControllerBase
     {
         var usuario = await _context.Usuarios.FindAsync(id);
         if (usuario == null) return NotFound(new { mensaje = "Usuario no encontrado" });
-
-        var adminId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!int.TryParse(adminId, out var adminIdInt))
-            return Unauthorized(new { mensaje = "Sesion invalida" });
-
-        var admin = await _context.Usuarios.FindAsync(adminIdInt);
-        if (admin == null || !admin.Activo)
-            return Unauthorized(new { mensaje = "Administrador no encontrado o inactivo" });
-
-        if (string.IsNullOrWhiteSpace(dto.PasswordConfirmacion) ||
-            !BCrypt.Net.BCrypt.Verify(dto.PasswordConfirmacion, admin.PasswordHash))
-            return Unauthorized(new { mensaje = "La contrasena de confirmacion es incorrecta" });
 
         var correoNormalizado = dto.Correo.Trim().ToLowerInvariant();
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { getUsuarios, crearUsuario, actualizarUsuario } from '../../services/usuarioService';
 
@@ -11,12 +11,15 @@ interface Usuario {
   activo: boolean;
 }
 
+type FiltroEstado = 'todos' | 'activo' | 'inactivo';
+type FiltroRol = 'todos' | 'Administrador' | 'Laboratorista';
+
 const dominioInstitucional = '@uta.edu.ec';
 
-const normalizarCorreo = (correo: string) => correo.trim().toLowerCase();
+const normalizarTexto = (valor: string) => valor.trim().toLowerCase();
 
 const correoInstitucionalValido = (correo: string) =>
-  normalizarCorreo(correo).endsWith(dominioInstitucional);
+  normalizarTexto(correo).endsWith(dominioInstitucional);
 
 const obtenerMensajeError = (error: unknown, respaldo: string) => {
   if (axios.isAxiosError(error)) {
@@ -42,17 +45,40 @@ export const UsuariosPage = () => {
   const [mensaje, setMensaje] = useState('');
   const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
   const [mostrarEditar, setMostrarEditar] = useState(false);
-  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-  const [passwordConfirmacion, setPasswordConfirmacion] = useState('');
-  const [formEditar, setFormEditar] = useState({ nombre: '', apellido: '', correo: '', rol: 'Laboratorista', activo: true });
+  const [formEditar, setFormEditar] = useState({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    rol: 'Laboratorista',
+    activo: true
+  });
 
   const [form, setForm] = useState({
-    nombre: '', apellido: '', correo: '', password: '', rol: 'Laboratorista'
+    nombre: '',
+    apellido: '',
+    correo: '',
+    rol: 'Laboratorista'
+  });
+
+  const [buscar, setBuscar] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>('todos');
+  const [filtroRol, setFiltroRol] = useState<FiltroRol>('todos');
+  const [chipAbierto, setChipAbierto] = useState<'estado' | 'rol' | null>(null);
+  const [confirmacion, setConfirmacion] = useState<{
+    abierta: boolean;
+    titulo: string;
+    descripcion: string;
+    onConfirm: (() => void | Promise<void>) | null;
+  }>({
+    abierta: false,
+    titulo: '',
+    descripcion: '',
+    onConfirm: null
   });
 
   const correoDuplicadoLocal = (correo: string, idIgnorado?: number) => {
-    const correoNormalizado = normalizarCorreo(correo);
-    return usuarios.some(u => normalizarCorreo(u.correo) === correoNormalizado && u.id !== idIgnorado);
+    const correoNormalizado = normalizarTexto(correo);
+    return usuarios.some(u => normalizarTexto(u.correo) === correoNormalizado && u.id !== idIgnorado);
   };
 
   const cargar = async () => {
@@ -66,7 +92,9 @@ export const UsuariosPage = () => {
     }
   };
 
-  useEffect(() => { cargar(); }, [pagina]);
+  useEffect(() => {
+    cargar();
+  }, [pagina]);
 
   const validarCorreoUsuario = (correo: string, idIgnorado?: number) => {
     if (!correoInstitucionalValido(correo)) {
@@ -92,24 +120,53 @@ export const UsuariosPage = () => {
     }
   };
 
+  const cerrarConfirmacion = () => {
+    setConfirmacion({
+      abierta: false,
+      titulo: '',
+      descripcion: '',
+      onConfirm: null
+    });
+  };
+
+  const abrirConfirmacion = (
+    titulo: string,
+    descripcion: string,
+    onConfirm: () => void | Promise<void>
+  ) => {
+    setConfirmacion({
+      abierta: true,
+      titulo,
+      descripcion,
+      onConfirm
+    });
+  };
+
   const handleCrear = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const correo = normalizarCorreo(form.correo);
+    const correo = normalizarTexto(form.correo);
     if (!validarCorreoUsuario(correo)) return;
 
-    try {
-      await crearUsuario({ ...form, correo });
-      setMensaje('Usuario creado exitosamente');
-      setMostrarForm(false);
-      setForm({ nombre: '', apellido: '', correo: '', password: '', rol: 'Laboratorista' });
-      cargar();
-    } catch (error) {
-      setMensaje(obtenerMensajeError(error, 'Error al crear usuario'));
-    }
+    abrirConfirmacion(
+      'Confirmar creación',
+      `Vas a crear el usuario ${form.nombre} ${form.apellido} con el correo ${correo}.`,
+      async () => {
+        try {
+          await crearUsuario({ ...form, correo });
+          setMensaje('Usuario creado exitosamente');
+          setMostrarForm(false);
+          setForm({ nombre: '', apellido: '', correo: '', rol: 'Laboratorista' });
+          await cargar();
+        } catch (error) {
+          setMensaje(obtenerMensajeError(error, 'Error al crear usuario'));
+        }
+      }
+    );
   };
 
   const handleEditarClick = (usuario: Usuario) => {
+    setMensaje('');
     setUsuarioEditando(usuario);
     setFormEditar({
       nombre: usuario.nombre,
@@ -118,53 +175,66 @@ export const UsuariosPage = () => {
       rol: usuario.rol,
       activo: usuario.activo
     });
-    setPasswordConfirmacion('');
-    setMostrarConfirmacion(false);
     setMostrarEditar(true);
   };
 
   const cerrarEdicion = () => {
     setMostrarEditar(false);
-    setMostrarConfirmacion(false);
     setUsuarioEditando(null);
-    setPasswordConfirmacion('');
+    setMensaje('');
   };
 
-  const handleGuardarEdicion = (e: React.FormEvent) => {
+  const handleGuardarEdicion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!usuarioEditando) return;
 
     if (!validarCorreoUsuario(formEditar.correo, usuarioEditando.id)) return;
 
-    setPasswordConfirmacion('');
-    setMostrarConfirmacion(true);
+    abrirConfirmacion(
+      'Confirmar cambios',
+      `Vas a actualizar los datos de ${usuarioEditando.nombre} ${usuarioEditando.apellido}.`,
+      async () => {
+        setGuardando(true);
+        try {
+          await actualizarUsuario(usuarioEditando.id, {
+            ...formEditar,
+            correo: normalizarTexto(formEditar.correo)
+          });
+          setMensaje('Usuario actualizado correctamente');
+          cerrarEdicion();
+          await cargar();
+        } catch (error) {
+          setMensaje(obtenerMensajeError(error, 'Error al actualizar usuario'));
+        } finally {
+          setGuardando(false);
+        }
+      }
+    );
   };
 
-  const confirmarGuardado = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!usuarioEditando) return;
+  const usuariosFiltrados = useMemo(() => {
+    const busqueda = normalizarTexto(buscar);
 
-    if (!passwordConfirmacion.trim()) {
-      setMensaje('Ingresa tu contrasena para confirmar los cambios');
-      return;
-    }
+    return usuarios.filter(usuario => {
+      const coincideBusqueda =
+        !busqueda ||
+        normalizarTexto(`${usuario.nombre} ${usuario.apellido}`).includes(busqueda) ||
+        normalizarTexto(usuario.correo).includes(busqueda) ||
+        normalizarTexto(usuario.rol).includes(busqueda);
 
-    setGuardando(true);
-    try {
-      await actualizarUsuario(usuarioEditando.id, {
-        ...formEditar,
-        correo: normalizarCorreo(formEditar.correo),
-        passwordConfirmacion
-      });
-      setMensaje('Usuario actualizado correctamente');
-      cerrarEdicion();
-      cargar();
-    } catch (error) {
-      setMensaje(obtenerMensajeError(error, 'Error al actualizar usuario'));
-    } finally {
-      setGuardando(false);
-    }
-  };
+      const coincideEstado =
+        filtroEstado === 'todos' ||
+        (filtroEstado === 'activo' && usuario.activo) ||
+        (filtroEstado === 'inactivo' && !usuario.activo);
+
+      const coincideRol = filtroRol === 'todos' || usuario.rol === filtroRol;
+
+      return coincideBusqueda && coincideEstado && coincideRol;
+    });
+  }, [buscar, filtroEstado, filtroRol, usuarios]);
+
+  const etiquetaEstado = filtroEstado === 'todos' ? 'Estado' : filtroEstado === 'activo' ? 'Activo' : 'Inactivo';
+  const etiquetaRol = filtroRol === 'todos' ? 'Rol' : filtroRol;
 
   return (
     <section className="page-section">
@@ -186,7 +256,13 @@ export const UsuariosPage = () => {
       )}
 
       {mostrarForm && (
-        <form onSubmit={handleCrear} className="card card--padded form-grid users-form">
+        <form onSubmit={handleCrear} className="card card--padded users-form users-form--compact">
+          <div className="section-header users-form__header">
+            <div>
+              <p className="section-kicker">Nuevo usuario</p>
+              <h3 className="section-title users-form__title">Crear cuenta institucional</h3>
+            </div>
+          </div>
           <div className="form-field">
             <label className="form-label" htmlFor="nombre">Nombre</label>
             <input
@@ -224,17 +300,6 @@ export const UsuariosPage = () => {
             />
           </div>
           <div className="form-field">
-            <label className="form-label" htmlFor="password">Contrasena</label>
-            <input
-              id="password"
-              type="password"
-              className="form-input"
-              value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              required
-            />
-          </div>
-          <div className="form-field">
             <label className="form-label" htmlFor="rol">Rol</label>
             <select
               id="rol"
@@ -247,12 +312,87 @@ export const UsuariosPage = () => {
             </select>
           </div>
           <div className="form-actions form-field--full">
-            <button type="submit" className="btn btn--primary">
+            <button type="submit" className="btn btn--primary users-form__submit">
               Crear Usuario
             </button>
           </div>
         </form>
       )}
+
+      <div className="card card--padded mb-20 users-chipbar">
+        <div className="users-chipbar__search">
+          <input
+            id="buscar-usuario"
+            className="form-input form-input--compact users-chipbar__input"
+            value={buscar}
+            onChange={e => setBuscar(e.target.value)}
+            placeholder="Buscar usuarios"
+          />
+        </div>
+        <div className="users-chipbar__chips">
+          <div className="users-chipbar__chipwrap">
+            <button
+              type="button"
+              className={`users-chip ${chipAbierto === 'estado' ? 'users-chip--active' : ''}`}
+              onClick={() => setChipAbierto(chipAbierto === 'estado' ? null : 'estado')}
+            >
+              {etiquetaEstado}
+            </button>
+            {chipAbierto === 'estado' && (
+              <div className="users-chip__menu">
+                {[
+                  ['todos', 'Todos'],
+                  ['activo', 'Activo'],
+                  ['inactivo', 'Inactivo']
+                ].map(([valor, texto]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    className={`users-chip__option ${filtroEstado === valor ? 'users-chip__option--active' : ''}`}
+                    onClick={() => {
+                      setFiltroEstado(valor as FiltroEstado);
+                      setChipAbierto(null);
+                    }}
+                  >
+                    {texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="users-chipbar__chipwrap">
+            <button
+              type="button"
+              className={`users-chip ${chipAbierto === 'rol' ? 'users-chip--active' : ''}`}
+              onClick={() => setChipAbierto(chipAbierto === 'rol' ? null : 'rol')}
+            >
+              {etiquetaRol}
+            </button>
+            {chipAbierto === 'rol' && (
+              <div className="users-chip__menu">
+                {[
+                  ['todos', 'Todos'],
+                  ['Administrador', 'Administrador'],
+                  ['Laboratorista', 'Laboratorista']
+                ].map(([valor, texto]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    className={`users-chip__option ${filtroRol === valor ? 'users-chip__option--active' : ''}`}
+                    onClick={() => {
+                      setFiltroRol(valor as FiltroRol);
+                      setChipAbierto(null);
+                    }}
+                  >
+                    {texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {mostrarEditar && usuarioEditando && (
         <div className="modal-backdrop">
@@ -332,40 +472,38 @@ export const UsuariosPage = () => {
               >
                 {formEditar.activo ? 'Suspender Usuario' : 'Activar Usuario'}
               </button>
-              <button type="submit" className="btn btn--danger">
-                Guardar Cambios
+              <button type="submit" className="btn btn--danger" disabled={guardando}>
+                {guardando ? 'Guardando...' : 'Guardar Cambios'}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {mostrarConfirmacion && usuarioEditando && (
+      {confirmacion.abierta && (
         <div className="modal-backdrop modal-backdrop--top">
-          <form onSubmit={confirmarGuardado} className="confirm-modal">
-            <h3>Seguro quieres cambiar?</h3>
-            <p>Para generar los cambios de {usuarioEditando.nombre} {usuarioEditando.apellido}, ingresa tu contrasena.</p>
-            <div className="form-field">
-              <label className="form-label" htmlFor="confirm-password">Contrasena</label>
-              <input
-                id="confirm-password"
-                type="password"
-                className="form-input"
-                value={passwordConfirmacion}
-                onChange={e => setPasswordConfirmacion(e.target.value)}
-                autoFocus
-                required
-              />
-            </div>
+          <div className="confirm-modal">
+            <h3>{confirmacion.titulo}</h3>
+            <p>{confirmacion.descripcion}</p>
             <div className="form-actions">
-              <button type="button" onClick={() => setMostrarConfirmacion(false)} className="btn btn--outline">
+              <button type="button" onClick={cerrarConfirmacion} className="btn btn--outline">
                 Cancelar
               </button>
-              <button type="submit" className="btn btn--danger" disabled={guardando}>
-                {guardando ? 'Guardando...' : 'Confirmar Cambios'}
+              <button
+                type="button"
+                className="btn btn--danger"
+                onClick={async () => {
+                  const accion = confirmacion.onConfirm;
+                  cerrarConfirmacion();
+                  if (accion) {
+                    await accion();
+                  }
+                }}
+              >
+                Confirmar
               </button>
             </div>
-          </form>
+          </div>
         </div>
       )}
 
@@ -384,29 +522,33 @@ export const UsuariosPage = () => {
             <tbody>
               {cargando ? (
                 <tr><td colSpan={5} className="state-box">Cargando...</td></tr>
-              ) : usuarios.map(u => (
-                <tr key={u.id}>
-                  <td>
-                    <div className="cell-title">{u.nombre} {u.apellido}</div>
-                  </td>
-                  <td>{u.correo}</td>
-                  <td>
-                    <span className={`badge ${u.rol === 'Administrador' ? 'badge--primary' : 'badge--success'}`}>
-                      {u.rol}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`badge ${u.activo ? 'badge--success' : 'badge--error'}`}>
-                      {u.activo ? 'Activo' : 'Suspendido'}
-                    </span>
-                  </td>
-                  <td>
-                    <button onClick={() => handleEditarClick(u)} className="btn btn--secondary btn--sm">
-                      Editar
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              ) : usuariosFiltrados.length === 0 ? (
+                <tr><td colSpan={5} className="state-box">No hay usuarios que coincidan con los filtros.</td></tr>
+              ) : (
+                usuariosFiltrados.map(u => (
+                  <tr key={u.id}>
+                    <td>
+                      <div className="cell-title">{u.nombre} {u.apellido}</div>
+                    </td>
+                    <td>{u.correo}</td>
+                    <td>
+                      <span className={`badge ${u.rol === 'Administrador' ? 'badge--primary' : 'badge--success'}`}>
+                        {u.rol}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${u.activo ? 'badge--success' : 'badge--error'}`}>
+                        {u.activo ? 'Activo' : 'Suspendido'}
+                      </span>
+                    </td>
+                    <td>
+                      <button onClick={() => handleEditarClick(u)} className="btn btn--secondary btn--sm">
+                        Editar
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

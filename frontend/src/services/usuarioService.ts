@@ -15,7 +15,6 @@ export const crearUsuario = async (datos: {
   nombre: string;
   apellido: string;
   correo: string;
-  password: string;
   rol: string;
 }) => {
   const res = await axios.post(`${API_URL}/usuarios`, datos, getHeaders());
@@ -33,7 +32,6 @@ export const actualizarUsuario = async (id: number, datos: {
   correo: string;
   rol: string;
   activo: boolean;
-  passwordConfirmacion: string;
 }) => {
   const res = await axios.put(`${API_URL}/usuarios/${id}`, datos, getHeaders());
   return res.data;
