@@ -23,6 +23,20 @@ namespace FISEI.Mantenimientos.API.Services
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
+                // Validación: Verificar que los equipos no estén ya en un mantenimiento activo
+                var equiposIds = request.Equipos.Select(e => e.EquipoId).ToList();
+                var equiposOcupados = await _dbContext.DetallesMantenimientos
+                    .Where(d => equiposIds.Contains(d.EquipoId) && 
+                                d.EstadoIndividual != "Finalizado" && 
+                                d.EstadoIndividual != "No Reparado (De Baja)")
+                    .Select(d => d.EquipoId)
+                    .ToListAsync();
+
+                if (equiposOcupados.Any())
+                {
+                    throw new Exception("Uno o más equipos seleccionados ya se encuentran en un proceso de mantenimiento activo.");
+                }
+
                 int anio = DateTime.Now.Year;
                 string prefijo = $"MANT-{anio}-";
                 
@@ -178,6 +192,74 @@ namespace FISEI.Mantenimientos.API.Services
                     detalle.Caso.CodigoCaso,
                     detalle.EquipoId);
             }
+
+            return detalle;
+        }
+
+        public async Task<DetallesMantenimiento> ResolverDetalleAsync(Guid ordenId, Guid detalleId, ResolverDetalleDto request)
+        {
+            var detalle = await _dbContext.DetallesMantenimientos
+                .Include(d => d.Caso)
+                .Include(d => d.AccionPredefinida)
+                .Include(d => d.MantenimientoRecursos)
+                .FirstOrDefaultAsync(d => d.Id == detalleId && d.CasoId == ordenId);
+
+            if (detalle == null)
+            {
+                throw new Exception("Detalle no encontrado");
+            }
+
+            if (detalle.EstadoIndividual == "Finalizado" || detalle.EstadoIndividual == "No Reparado (De Baja)")
+            {
+                throw new Exception("El detalle ya se encuentra finalizado.");
+            }
+
+            detalle.DiagnosticoPredefinidoId = request.DiagnosticoPredefinidoId;
+            detalle.DescripcionDetalladaMantenimiento = request.DescripcionDetallada;
+            
+            if (request.AccionesIds != null && request.AccionesIds.Any())
+            {
+                var acciones = await _dbContext.AccionesPredefinidas
+                    .Where(a => request.AccionesIds.Contains(a.Id))
+                    .ToListAsync();
+                    
+                foreach(var accion in acciones)
+                {
+                    if (!detalle.AccionPredefinida.Any(a => a.Id == accion.Id))
+                    {
+                        detalle.AccionPredefinida.Add(accion);
+                    }
+                }
+            }
+
+            if (request.Recursos != null)
+            {
+                foreach(var rec in request.Recursos)
+                {
+                    if (string.IsNullOrEmpty(rec.TipoRecursoPrincipal) || rec.TipoRecursoPrincipal == "Ninguno")
+                    {
+                        continue;
+                    }
+
+                    _dbContext.MantenimientoRecursos.Add(new MantenimientoRecurso
+                    {
+                        TipoRecursoPrincipal = rec.TipoRecursoPrincipal,
+                        RecursoSubcategoriaId = rec.RecursoSubcategoriaId,
+                        CantidadUtilizada = rec.CantidadUtilizada,
+                        DetalleMantenimientoId = detalle.Id
+                    });
+                }
+            }
+
+            detalle.EstadoIndividual = "Finalizado";
+            detalle.FechaFin = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+
+            await _notificacionesClient.EnviarCompletadoAsync(
+                detalle.LaboratoristaAsignadoId,
+                detalle.Caso.CodigoCaso,
+                detalle.EquipoId);
 
             return detalle;
         }

@@ -9,6 +9,7 @@ namespace FISEI.Mantenimientos.API.Services
     {
         Task<CasosMantenimiento> CrearOrdenAsync(CrearOrdenRequestDto request, int usuarioId);
         Task<DetallesMantenimiento> ActualizarEstadoAsync(Guid ordenId, Guid detalleId, ActualizarEstadoRequestDto request);
+        Task<DetallesMantenimiento> ResolverDetalleAsync(Guid ordenId, Guid detalleId, ResolverDetalleDto request);
         Task<CasosMantenimiento> CerrarOrdenAsync(Guid ordenId);
     }
 }

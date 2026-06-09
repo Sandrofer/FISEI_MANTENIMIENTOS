@@ -47,6 +47,7 @@ public class NotificacionesController : ControllerBase
         await _dbContext.SaveChangesAsync();
 
         var response = NotificacionResponseDto.FromEntity(notificacion);
+
         await _hubContext.Clients
             .Group($"user_{request.UsuarioId}")
             .SendAsync("RecibirNotificacion", response);

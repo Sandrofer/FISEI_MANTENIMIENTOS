@@ -23,208 +23,82 @@ public class InventarioController : ControllerBase
     public IActionResult DescargarPlantilla()
     {
         var contenido = _excelImportService.GenerarPlantilla();
-        return File(
-            contenido,
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "plantilla_equipos.xlsx");
+        return File(contenido, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "plantilla_equipos.xlsx");
     }
 
     [HttpPost("equipos/importar")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ImportarEquipos([FromForm] IFormFile? archivo, [FromForm] bool importacionParcial, [FromForm] bool autoCrear, CancellationToken cancellationToken)
     {
-        if (archivo is null)
-        {
-            return BadRequest(new ImportacionEquiposResponseDto
-            {
-                Success = false,
-                Errores =
-                [
-                    new ErrorImportacionDto
-                    {
-                        Fila = 0,
-                        Campo = "Archivo",
-                        Mensaje = "Debe adjuntar un archivo .xlsx."
-                    }
-                ]
-            });
-        }
-
-        if (!TryGetUsuarioId(out var usuarioId))
-        {
-            return Unauthorized(new
-            {
-                success = false,
-                mensaje = "No se pudo identificar el usuario autenticado."
-            });
-        }
-
-        try
-        {
-            var resultado = await _excelImportService.ImportarAsync(archivo, usuarioId, importacionParcial, autoCrear, cancellationToken);
-            return resultado.Success ? Ok(resultado) : BadRequest(resultado);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new ImportacionEquiposResponseDto
-            {
-                Success = false,
-                Errores =
-                [
-                    new ErrorImportacionDto
-                    {
-                        Fila = 0,
-                        Campo = "Archivo",
-                        Mensaje = $"No se pudo completar la importacion. {ex.Message}"
-                    }
-                ]
-            });
-        }
+        if (archivo is null) return BadRequest(new ImportacionEquiposResponseDto { Success = false, Errores = [new ErrorImportacionDto { Fila = 0, Campo = "Archivo", Mensaje = "Debe adjuntar un archivo .xlsx." }] });
+        if (!TryGetUsuarioId(out var usuarioId)) return Unauthorized(new { success = false, mensaje = "No se pudo identificar el usuario." });
+        try { var r = await _excelImportService.ImportarAsync(archivo, usuarioId, importacionParcial, autoCrear, cancellationToken); return r.Success ? Ok(r) : BadRequest(r); }
+        catch (Exception ex) { return StatusCode(500, new ImportacionEquiposResponseDto { Success = false, Errores = [new ErrorImportacionDto { Fila = 0, Campo = "Archivo", Mensaje = ex.Message }] }); }
     }
 
     [HttpPost("equipos/validar-importacion")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ValidarImportacion([FromForm] IFormFile? archivo, CancellationToken cancellationToken)
     {
-        if (archivo is null)
-        {
-            return BadRequest(new ResumenValidacionDto
-            {
-                Success = false,
-                Mensaje = "Debe adjuntar un archivo .xlsx."
-            });
-        }
-
-        try
-        {
-            var resultado = await _excelImportService.ValidarImportacionAsync(archivo, cancellationToken);
-            return Ok(resultado);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new ResumenValidacionDto
-            {
-                Success = false,
-                Mensaje = $"Error al validar el archivo: {ex.Message}"
-            });
-        }
+        if (archivo is null) return BadRequest(new ResumenValidacionDto { Success = false, Mensaje = "Debe adjuntar un archivo." });
+        try { return Ok(await _excelImportService.ValidarImportacionAsync(archivo, cancellationToken)); }
+        catch (Exception ex) { return StatusCode(500, new ResumenValidacionDto { Success = false, Mensaje = ex.Message }); }
     }
 
     [HttpPost("individual")]
     public async Task<IActionResult> RegistrarEquipo([FromBody] CrearEquipoDto dto)
     {
-        try
-        {
-            var resultado = await _service.RegistrarEquipoAsync(dto);
-            return Ok(resultado);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { mensaje = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { mensaje = "Error al registrar el equipo", detalle = ex.Message });
-        }
+        try { return Ok(await _service.RegistrarEquipoAsync(dto)); }
+        catch (InvalidOperationException ex) { return Conflict(new { mensaje = ex.Message }); }
+        catch (Exception ex) { return StatusCode(500, new { mensaje = "Error al registrar", detalle = ex.Message }); }
     }
 
     [HttpGet("equipos")]
-    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos([FromQuery] string? estado)
-    {
-        var equipos = await _service.ObtenerEquiposAsync(estado);
-        return Ok(equipos);
-    }
+    public async Task<ActionResult<List<EquipoResponseDto>>> ObtenerEquipos([FromQuery] string? estado, [FromQuery] string? procesador)
+        => Ok(await _service.ObtenerEquiposAsync(estado, procesador));
 
     [HttpGet("equipos/{id:guid}/hoja-vida")]
     public async Task<IActionResult> ObtenerHojaVidaEquipo(Guid id)
     {
-        var hojaVida = await _service.ObtenerHojaVidaEquipoAsync(id);
-
-        if (hojaVida is null)
-        {
-            return NotFound(new { message = "Equipo no encontrado" });
-        }
-
-        return Ok(hojaVida);
+        var h = await _service.ObtenerHojaVidaEquipoAsync(id);
+        return h is null ? NotFound(new { message = "Equipo no encontrado" }) : Ok(h);
     }
 
     [HttpPut("equipos/{id:guid}")]
     public async Task<IActionResult> ActualizarEquipo(Guid id, [FromBody] ActualizarEquipoDto dto)
     {
-        var resultado = await _service.ActualizarEquipoAsync(id, dto);
-
-        if (resultado is null)
-        {
-            return NotFound(new { mensaje = "Equipo no encontrado" });
-        }
-
-        return Ok(resultado);
+        var r = await _service.ActualizarEquipoAsync(id, dto);
+        return r is null ? NotFound(new { mensaje = "Equipo no encontrado" }) : Ok(r);
     }
+
+    [HttpGet("categorias")]
+    public async Task<IActionResult> GetCategorias() => Ok(await _service.ObtenerCategoriasAsync());
+
+    [HttpGet("marcas")]
+    public async Task<IActionResult> GetMarcas() => Ok(await _service.ObtenerMarcasAsync());
+
+    [HttpGet("ubicaciones")]
+    public async Task<IActionResult> GetUbicaciones() => Ok(await _service.ObtenerUbicacionesAsync());
 
     [HttpDelete("equipos/{id:guid}")]
     public async Task<IActionResult> EliminarEquipo(Guid id)
     {
-        var eliminado = await _service.EliminarEquipoAsync(id);
-
-        if (!eliminado)
-        {
-            return NotFound(new { mensaje = "Equipo no encontrado" });
-        }
-
-        return Ok(new { mensaje = "Equipo eliminado correctamente" });
+        return await _service.EliminarEquipoAsync(id) ? Ok(new { mensaje = "Equipo eliminado" }) : NotFound(new { mensaje = "Equipo no encontrado" });
     }
 
     private bool TryGetUsuarioId(out int usuarioId)
     {
-        if (TryReadUsuarioId(User.Claims, out usuarioId))
-        {
-            return true;
-        }
-
-        var authorization = Request.Headers.Authorization.ToString();
-        if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-        {
-            usuarioId = 0;
-            return false;
-        }
-
-        try
-        {
-            var token = authorization["Bearer ".Length..].Trim();
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            return TryReadUsuarioId(jwt.Claims, out usuarioId);
-        }
-        catch
-        {
-            usuarioId = 0;
-            return false;
-        }
+        if (TryReadUsuarioId(User.Claims, out usuarioId)) return true;
+        var auth = Request.Headers.Authorization.ToString();
+        if (!auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) { usuarioId = 0; return false; }
+        try { return TryReadUsuarioId(new JwtSecurityTokenHandler().ReadJwtToken(auth["Bearer ".Length..].Trim()).Claims, out usuarioId); }
+        catch { usuarioId = 0; return false; }
     }
 
     private static bool TryReadUsuarioId(IEnumerable<Claim> claims, out int usuarioId)
     {
-        var idClaimTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "usuario_id",
-            "user_id",
-            "userid",
-            "id",
-            JwtRegisteredClaimNames.Sub,
-            "sub",
-            "nameid",
-            ClaimTypes.NameIdentifier
-        };
-
-        var rawUserId = claims
-            .FirstOrDefault(c => idClaimTypes.Contains(c.Type))
-            ?.Value;
-
-        if (int.TryParse(rawUserId, out usuarioId) && usuarioId > 0)
-        {
-            return true;
-        }
-
-        usuarioId = 0;
-        return false;
+        var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "usuario_id", "user_id", "id", JwtRegisteredClaimNames.Sub, "sub", "nameid", ClaimTypes.NameIdentifier };
+        var raw = claims.FirstOrDefault(c => ids.Contains(c.Type))?.Value;
+        return int.TryParse(raw, out usuarioId) && usuarioId > 0;
     }
 }

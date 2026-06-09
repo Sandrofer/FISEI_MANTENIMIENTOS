@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { obtenerEquipos } from '../../services/inventarioService';
 import type { Equipo } from '../../services/inventarioService';
 import { getUsuarios } from '../../services/usuarioService';
-import { crearOrdenMantenimiento } from '../../services/mantenimientoService';
+import { crearOrdenMantenimiento, obtenerTodasLasOrdenes } from '../../services/mantenimientoService';
 import type { CrearOrdenRequestDto } from '../../services/mantenimientoService';
 
 export const NuevaOrdenPage: React.FC = () => {
@@ -25,7 +25,23 @@ export const NuevaOrdenPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const eqs = await obtenerEquipos({ estado: 'Operativo' });
-        setEquipos(eqs);
+        
+        // Obtener órdenes activas para filtrar equipos que ya están en mantenimiento
+        const ordenes = await obtenerTodasLasOrdenes();
+        const equiposOcupados = new Set<string>();
+        ordenes.forEach((o: any) => {
+          if (o.estadoGeneral !== 'Cerrado') {
+            o.detallesMantenimientos?.forEach((d: any) => {
+              if (d.estadoIndividual !== 'Finalizado' && d.estadoIndividual !== 'No Reparado (De Baja)') {
+                equiposOcupados.add(d.equipoId);
+              }
+            });
+          }
+        });
+
+        // Solo mostrar equipos que no están ocupados
+        const eqsDisponibles = eqs.filter(e => !equiposOcupados.has(e.id.toString()));
+        setEquipos(eqsDisponibles);
 
         const labs = Array.from(new Set(eqs.map((e: any) => e.ubicacion || e.laboratorio).filter(Boolean)));
         setLaboratoriosUnicos(labs as string[]);

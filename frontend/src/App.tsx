@@ -9,6 +9,7 @@ import { HojaVidaPage } from './pages/admin/HojaVidaPage';
 import { ImportarEquipos } from './pages/admin/ImportarEquipos';
 import { LabPage } from './pages/lab/LabPage';
 import './App.css';
+import RegistrarEquipoPage from './pages/inventario/RegistrarEquipoPage';
 
 function App() {
   return (
@@ -40,6 +41,11 @@ function App() {
               <LabPage />
             </ProtectedRoute>
           } />
+          <Route path="/admin/registrar-equipo" element={
+  <ProtectedRoute rolesPermitidos={['Administrador']}>
+    <RegistrarEquipoPage />
+  </ProtectedRoute>
+} />
           <Route path="/lab/inventario/:id/hoja-vida" element={
             <ProtectedRoute rolesPermitidos={['Laboratorista']}>
               <HojaVidaPage />
@@ -50,6 +56,11 @@ function App() {
               <HojaVidaPage />
             </ProtectedRoute>
           } />
+          <Route path="/lab/registrar-equipo" element={
+  <ProtectedRoute rolesPermitidos={['Laboratorista']}>
+    <RegistrarEquipoPage />
+  </ProtectedRoute>
+} />
           <Route path="/auth/callback" element={<MicrosoftCallbackPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>

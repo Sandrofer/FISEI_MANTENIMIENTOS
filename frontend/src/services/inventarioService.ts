@@ -1,14 +1,17 @@
 import axios from 'axios';
 
-const BASE_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api'}/inventario`;
+const BASE_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5064/api'}/inventario`;
 
 export interface CrearEquipoDto {
+  codigoInventario: string;
   numeroSerie: string;
-  marca: string;
-  modelo: string;
-  procesador: string;
-  laboratorio: string;
-  fechaCompra: string;
+  nombreModelo: string;
+  categoriaId: number;
+  marcaId: number;
+  ubicacionId: number;
+  estado: string;
+  responsableId: number;
+  especificacionesTecnicas: string;
 }
 
 export interface ActualizarEquipoDto extends CrearEquipoDto {
@@ -35,33 +38,50 @@ export interface Mantenimiento {
 }
 
 export interface EquipoResponse {
-  id: number;
+  id: string;
+  codigoInventario: string;
   numeroSerie: string;
+  nombreModelo: string;
+  categoriaId: number;
+  categoria: string;
+  marcaId: number;
   marca: string;
-  modelo: string;
-  procesador: string;
-  laboratorio: string;
-  fechaCompra: string;
+  ubicacionId: number;
+  ubicacion: string;
   estado: string;
+  responsableId: number;
+  especificacionesTecnicas: string;
   fechaRegistro: string;
-  mantenimientos: MantenimientoResponse[];
+  loteImportacionId: string | null;
 }
 
 export interface Equipo {
-  id: number;
+  id: string;
+  codigoInventario: string;
   numeroSerie: string;
+  nombreModelo: string;
+  categoriaId: number;
+  categoria: string;
+  marcaId: number;
   marca: string;
-  modelo: string;
-  procesador: string;
-  laboratorio: string;
-  fechaCompra: string;
+  ubicacionId: number;
+  ubicacion: string;
   estado: string;
+  responsableId: number;
+  especificacionesTecnicas: string;
   fechaRegistro: string;
+  loteImportacionId: string | null;
 }
 
 export interface HojaVida {
   equipo: Equipo;
   mantenimientos: Mantenimiento[];
+}
+
+export interface RecursoSubcategoria {
+  id: number;
+  tipoPrincipal: string;
+  nombreSubcategoria: string;
 }
 
 export const registrarEquipo = async (dto: CrearEquipoDto): Promise<EquipoResponse> => {
@@ -81,16 +101,21 @@ export const obtenerEquipos = async (filtros?: FiltrosEquipo): Promise<Equipo[]>
   return response.data;
 };
 
-export const getHojaVidaEquipo = async (id: number): Promise<HojaVida> => {
+export const getHojaVidaEquipo = async (id: string): Promise<HojaVida> => {
   const response = await axios.get<HojaVida>(`${BASE_URL}/equipos/${id}/hoja-vida`);
   return response.data;
 };
 
-export const actualizarEquipo = async (id: number, dto: ActualizarEquipoDto): Promise<Equipo> => {
+export const actualizarEquipo = async (id: string, dto: ActualizarEquipoDto): Promise<Equipo> => {
   const response = await axios.put<Equipo>(`${BASE_URL}/equipos/${id}`, dto);
   return response.data;
 };
 
-export const eliminarEquipo = async (id: number): Promise<void> => {
+export const eliminarEquipo = async (id: string): Promise<void> => {
   await axios.delete(`${BASE_URL}/equipos/${id}`);
+};
+
+export const obtenerSubcategoriasRecursos = async (tipoPrincipal: string): Promise<RecursoSubcategoria[]> => {
+  const response = await axios.get<RecursoSubcategoria[]>(`${BASE_URL}/recursos/subcategorias/${tipoPrincipal}`);
+  return response.data;
 };
