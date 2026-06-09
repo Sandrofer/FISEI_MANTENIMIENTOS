@@ -143,6 +143,15 @@ namespace FISEI.Mantenimientos.API.Services
                     detalle.EquipoId);
             }
 
+            var primerDetalle = casoMaestro.DetallesMantenimientos.FirstOrDefault();
+            if (primerDetalle != null)
+            {
+                await _notificacionesClient.EnviarCierreAsync(
+                    casoMaestro.CreadoPorUsuarioId,
+                    casoMaestro.CodigoCaso,
+                    primerDetalle.EquipoId);
+            }
+
             return casoMaestro;
         }
 
@@ -191,6 +200,15 @@ namespace FISEI.Mantenimientos.API.Services
                     detalle.LaboratoristaAsignadoId,
                     detalle.Caso.CodigoCaso,
                     detalle.EquipoId);
+            }
+
+            if (estadoAnterior != detalle.EstadoIndividual && EsEstadoTecnicoNotificable(detalle.EstadoIndividual))
+            {
+                await _notificacionesClient.EnviarCambioEstadoAdminAsync(
+                    detalle.Caso.CreadoPorUsuarioId,
+                    detalle.Caso.CodigoCaso,
+                    detalle.EquipoId,
+                    detalle.EstadoIndividual);
             }
 
             return detalle;
@@ -261,7 +279,48 @@ namespace FISEI.Mantenimientos.API.Services
                 detalle.Caso.CodigoCaso,
                 detalle.EquipoId);
 
+            await _notificacionesClient.EnviarCambioEstadoAdminAsync(
+                detalle.Caso.CreadoPorUsuarioId,
+                detalle.Caso.CodigoCaso,
+                detalle.EquipoId,
+                detalle.EstadoIndividual);
+
             return detalle;
+        }
+<<<<<<< Updated upstream
+
+        private static bool EsEstadoTecnicoNotificable(string estado)
+        {
+            return estado == "En Proceso"
+                || estado == "Finalizado"
+                || estado == "No Reparado (De Baja)";
+=======
+        public async Task<System.Collections.Generic.List<MantenimientoEquipoDto>> ObtenerMantenimientosPorEquipoAsync(Guid equipoId)
+        {
+            var detalles = await _dbContext.DetallesMantenimientos
+                .Include(d => d.Caso)
+                .Include(d => d.DiagnosticoPredefinido)
+                .Include(d => d.AccionPredefinida)
+                .Where(d => d.EquipoId == equipoId)
+                .OrderByDescending(d => d.Caso.FechaIngreso)
+                .ToListAsync();
+
+            return detalles.Select(d => new MantenimientoEquipoDto
+            {
+                Id = d.Id,
+                CodigoCaso = d.Caso.CodigoCaso,
+                FechaProgramada = d.Caso.FechaIngreso,
+                FechaInicio = d.FechaInicio,
+                FechaCierre = d.FechaFin,
+                Estado = d.EstadoIndividual,
+                Tipo = d.Caso.TipoMantenimiento,
+                Responsable = d.LaboratoristaAsignadoId.ToString(), // Or retrieve name if available
+                Diagnostico = d.DiagnosticoPredefinido?.Descripcion,
+                AccionesRealizadas = string.Join("\n", d.AccionPredefinida.Select(a => a.Nombre)) + 
+                                     (!string.IsNullOrEmpty(d.DescripcionDetalladaMantenimiento) ? "\n" + d.DescripcionDetalladaMantenimiento : ""),
+                Observaciones = d.Caso.DescripcionGeneral
+            }).ToList();
+>>>>>>> Stashed changes
         }
     }
 }

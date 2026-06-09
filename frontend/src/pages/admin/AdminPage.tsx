@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { CampanaNotificaciones } from '../../components/CampanaNotificaciones';
 import { UsuariosPage } from './UsuariosPage';
 import { InventarioPage } from './InventarioPage';
 import { ImportarEquipos } from './ImportarEquipos';
@@ -12,7 +13,14 @@ import { DashboardEstadisticasPage } from './DashboardEstadisticasPage';
 export const AdminPage = () => {
   const { usuario, cerrarSesion } = useAuth();
   const navigate = useNavigate();
-  const [seccion, setSeccion] = useState('inicio');
+  const location = useLocation();
+  const [seccion, setSeccion] = useState(location.search ? 'mantenimientos' : 'inicio');
+
+  useEffect(() => {
+    if (location.search) {
+      setSeccion('mantenimientos');
+    }
+  }, [location.search]);
 
   const handleLogout = () => {
     cerrarSesion();
@@ -115,7 +123,10 @@ export const AdminPage = () => {
             <p className="topbar__eyebrow">Panel administrativo</p>
             <h2 className="topbar__title">Gestion de mantenimientos FISEI</h2>
           </div>
-          <span className="topbar__meta">Universidad Tecnica de Ambato</span>
+          <div className="flex items-center gap-3">
+            {usuario?.rol === 'Administrador' && <CampanaNotificaciones destino="/admin" />}
+            <span className="topbar__meta">Universidad Tecnica de Ambato</span>
+          </div>
         </header>
 
         {seccion === 'inicio' && (

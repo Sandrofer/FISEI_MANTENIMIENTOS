@@ -96,7 +96,7 @@ export const LabPage = () => {
             <h2 className="topbar__title">Gestion de mantenimientos FISEI</h2>
           </div>
           <div className="flex items-center gap-3">
-            {usuario?.rol === 'Laboratorista' && <CampanaNotificaciones />}
+            {usuario?.rol === 'Laboratorista' && <CampanaNotificaciones destino="/mis-mantenimientos" />}
             <span className="topbar__meta">Universidad Tecnica de Ambato</span>
           </div>
         </header>

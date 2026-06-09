@@ -31,6 +31,20 @@ public class NotificacionesClient : INotificacionesClient
         return EnviarAsync(new CrearNotificacionRequest(usuarioId, codigoCaso, equipoId, mensaje, "CIERRE"));
     }
 
+    public Task EnviarCambioEstadoAdminAsync(int usuarioId, string codigoCaso, Guid equipoId, string estado)
+    {
+        var tipo = estado switch
+        {
+            "En Proceso" => "ESTADO_EN_PROCESO",
+            "Finalizado" => "ESTADO_FINALIZADO",
+            "No Reparado (De Baja)" => "ESTADO_NO_REPARADO",
+            _ => "CAMBIO_ESTADO"
+        };
+
+        var mensaje = $"El estado tecnico del caso {codigoCaso} cambio a {estado}.";
+        return EnviarAsync(new CrearNotificacionRequest(usuarioId, codigoCaso, equipoId, mensaje, tipo));
+    }
+
     private async Task EnviarAsync(CrearNotificacionRequest request)
     {
         try

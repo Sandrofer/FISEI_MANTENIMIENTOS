@@ -7,4 +7,6 @@ public interface INotificacionesClient
     Task EnviarCompletadoAsync(int usuarioId, string codigoCaso, Guid equipoId);
 
     Task EnviarCierreAsync(int usuarioId, string codigoCaso, Guid equipoId);
+
+    Task EnviarCambioEstadoAdminAsync(int usuarioId, string codigoCaso, Guid equipoId, string estado);
 }

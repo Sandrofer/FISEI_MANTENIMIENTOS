@@ -11,5 +11,6 @@ namespace FISEI.Mantenimientos.API.Services
         Task<DetallesMantenimiento> ActualizarEstadoAsync(Guid ordenId, Guid detalleId, ActualizarEstadoRequestDto request);
         Task<DetallesMantenimiento> ResolverDetalleAsync(Guid ordenId, Guid detalleId, ResolverDetalleDto request);
         Task<CasosMantenimiento> CerrarOrdenAsync(Guid ordenId);
+        Task<System.Collections.Generic.List<MantenimientoEquipoDto>> ObtenerMantenimientosPorEquipoAsync(Guid equipoId);
     }
 }

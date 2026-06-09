@@ -26,9 +26,11 @@ export interface MantenimientoResponse {
 }
 
 export interface Mantenimiento {
-  id: number;
+  id: string;
+  codigoCaso: string | null;
   fechaProgramada: string;
-  fechaRealizada: string | null;
+  fechaInicio: string | null;
+  fechaCierre: string | null;
   estado: string;
   tipo: string | null;
   responsable: string | null;

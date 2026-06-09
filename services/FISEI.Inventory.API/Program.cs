@@ -16,6 +16,12 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
 builder.Services.AddScoped<InventarioService>();
 builder.Services.AddScoped<ExcelImportService>();
 
+builder.Services.AddHttpClient("MantenimientosClient", client =>
+{
+    // Use the port defined in launchSettings.json for HTTP
+    client.BaseAddress = new Uri("http://localhost:5085");
+});
+
 // CORS para el frontend
 builder.Services.AddCors(options =>
 {

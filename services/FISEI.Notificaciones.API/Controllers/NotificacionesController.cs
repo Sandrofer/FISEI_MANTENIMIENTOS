@@ -83,6 +83,35 @@ public class NotificacionesController : ControllerBase
         return Ok(notificaciones);
     }
 
+    [HttpGet("historial")]
+    public async Task<ActionResult<IEnumerable<NotificacionResponseDto>>> ObtenerHistorial()
+    {
+        var usuarioId = ObtenerUsuarioId();
+        if (usuarioId is null)
+        {
+            return Unauthorized("Token invalido o sin identificador de usuario.");
+        }
+
+        var notificaciones = await _dbContext.Notificaciones
+            .AsNoTracking()
+            .Where(n => n.UsuarioId == usuarioId.Value)
+            .OrderByDescending(n => n.FechaCreacion)
+            .Take(100)
+            .Select(n => new NotificacionResponseDto(
+                n.Id,
+                n.UsuarioId,
+                n.CodigoCaso,
+                n.EquipoId,
+                n.Mensaje,
+                n.Tipo,
+                n.Leido,
+                n.FechaCreacion,
+                n.FechaLectura))
+            .ToListAsync();
+
+        return Ok(notificaciones);
+    }
+
     [HttpPatch("marcar-leidas")]
     public async Task<IActionResult> MarcarLeidas([FromBody] Guid[] ids)
     {
