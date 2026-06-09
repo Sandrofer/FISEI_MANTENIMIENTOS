@@ -456,7 +456,10 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
                     <td className="px-8 py-4">
                       {usuario?.rol === 'Laboratorista' && detalle.laboratoristaAsignadoId === usuario?.userId && detalle.estadoIndividual !== 'Finalizado' && detalle.estadoIndividual !== 'No Reparado (De Baja)' && (
                         <button
-                          onClick={() => {
+                          onClick={async () => {
+                            if (detalle.estadoIndividual === 'Pendiente') {
+                              await handleEstadoChange(detalle.id, 'En Proceso');
+                            }
                             setDetalleAResolver({
                               detalleId: detalle.id,
                               equipoId: detalle.equipoId,

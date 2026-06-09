@@ -121,5 +121,20 @@ namespace FISEI.Mantenimientos.API.Controllers
 
             return Ok(ordenes);
         }
+
+        [HttpGet("equipo/{equipoId}")]
+        [AllowAnonymous] // Allow inventory API to call without user token, or configure internal auth
+        public async Task<IActionResult> ObtenerMantenimientosPorEquipo(Guid equipoId)
+        {
+            try
+            {
+                var mantenimientos = await _mantenimientoService.ObtenerMantenimientosPorEquipoAsync(equipoId);
+                return Ok(mantenimientos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Mensaje = "Error al obtener historial del equipo", Detalle = ex.Message });
+            }
+        }
     }
 }

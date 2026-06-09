@@ -1,4 +1,4 @@
-﻿using Inventory.API.Data;
+using Inventory.API.Data;
 using Inventory.API.DTOs;
 using Inventory.API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +8,12 @@ namespace Inventory.API.Services;
 public class InventarioService
 {
     private readonly InventoryDbContext _context;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public InventarioService(InventoryDbContext context)
+    public InventarioService(InventoryDbContext context, IHttpClientFactory httpClientFactory)
     {
         _context = context;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<EquipoResponseDto> RegistrarEquipoAsync(CrearEquipoDto dto)
@@ -53,7 +55,34 @@ public class InventarioService
     public async Task<List<Marca>> ObtenerMarcasAsync() => await _context.Marcas.AsNoTracking().ToListAsync();
     public async Task<List<Ubicacion>> ObtenerUbicacionesAsync() => await _context.Ubicaciones.AsNoTracking().ToListAsync();
 
-    public async Task<EquipoResponseDto?> ObtenerHojaVidaEquipoAsync(Guid id) => await MapEquipoAsync(id);
+    public async Task<HojaVidaDto?> ObtenerHojaVidaEquipoAsync(Guid id)
+    {
+        var equipo = await MapEquipoAsync(id);
+        if (equipo == null) return null;
+
+        var hojaVida = new HojaVidaDto { Equipo = equipo };
+
+        try
+        {
+            var client = _httpClientFactory.CreateClient("MantenimientosClient");
+            var response = await client.GetAsync($"/api/mantenimientos/ordenes/equipo/{id}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var mantenimientos = await response.Content.ReadFromJsonAsync<List<MantenimientoDto>>();
+                if (mantenimientos != null)
+                {
+                    hojaVida.Mantenimientos = mantenimientos;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Log exception if necessary, return hojaVida with empty Mantenimientos for now
+        }
+
+        return hojaVida;
+    }
 
     public async Task<EquipoResponseDto?> ActualizarEquipoAsync(Guid id, ActualizarEquipoDto dto)
     {
