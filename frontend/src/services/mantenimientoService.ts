@@ -193,3 +193,48 @@ export const resolverDetalleMantenimiento = async (ordenId: string, detalleId: s
   const res = await axios.post(`${API_URL}/ordenes/${ordenId}/detalle/${detalleId}/resolver`, dto, getHeaders());
   return res.data;
 };
+
+// ── US-REP-02: Dashboard Estadístico ────────────────────────────────────────
+
+export interface MantenimientosPorMesDto {
+  mes: string;
+  anio: number;
+  numeroMes: number;
+  preventivo: number;
+  correctivo: number;
+  adaptativo: number;
+}
+
+export interface CausaFallaDto {
+  causa: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface TopEquipoDto {
+  equipoId: string;
+  totalMantenimientos: number;
+}
+
+export interface TarjetasResumenDto {
+  totalMantenimientos: number;
+  totalCompletados: number;
+  totalPendientes: number;
+  promedioDuracion: number;
+}
+
+export interface EstadisticasResponseDto {
+  grafico1: MantenimientosPorMesDto[];
+  grafico2: CausaFallaDto[];
+  grafico3: TopEquipoDto[];
+  tarjetas: TarjetasResumenDto;
+}
+
+export const obtenerEstadisticas = async (
+  fechaInicio: string,
+  fechaFin: string
+): Promise<EstadisticasResponseDto> => {
+  const params = new URLSearchParams({ fechaInicio, fechaFin });
+  const res = await axios.get(`${API_URL}/estadisticas?${params.toString()}`, getHeaders());
+  return res.data;
+};

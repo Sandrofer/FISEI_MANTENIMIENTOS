@@ -7,6 +7,7 @@ import { ImportarEquipos } from './ImportarEquipos';
 import RegistrarEquipoPage from '../inventario/RegistrarEquipoPage';
 import { MantenimientosDashboard } from '../mantenimiento/MantenimientosDashboard';
 import { PrediccionesIA } from './PrediccionesIA';
+import { DashboardEstadisticasPage } from './DashboardEstadisticasPage';
 
 export const AdminPage = () => {
   const { usuario, cerrarSesion } = useAuth();
@@ -84,6 +85,13 @@ export const AdminPage = () => {
         </span>
         Predicciones IA
       </button>
+          <button
+            onClick={() => setSeccion('estadisticas')}
+            className={`sidebar__link ${seccion === 'estadisticas' ? 'sidebar__link--active' : ''}`}
+          >
+            <span className="sidebar__icon"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg></span>
+            Estadísticas
+          </button>
         </nav>
 
 
@@ -172,6 +180,7 @@ export const AdminPage = () => {
         {seccion === 'importar-equipos' && <ImportarEquipos />}
         {seccion === 'mantenimientos' && <MantenimientosDashboard basePath="/admin" />}
         {seccion === 'predicciones-ia' && <PrediccionesIA />}
+        {seccion === 'estadisticas' && <DashboardEstadisticasPage />}
       </main>
     </div>
   );
