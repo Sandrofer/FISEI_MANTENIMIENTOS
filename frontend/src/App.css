@@ -1234,6 +1234,114 @@
   margin-bottom: 20px;
 }
 
+.users-form--compact {
+  display: grid;
+  gap: 16px 18px;
+}
+
+.users-form__header {
+  margin-bottom: 2px;
+}
+
+.users-form__title {
+  font-size: 1.05rem;
+}
+
+.users-form__submit {
+  min-width: 180px;
+}
+
+.users-chipbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-bottom: 20px;
+}
+
+.users-chipbar__search {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.users-chipbar__input {
+  width: 100%;
+}
+
+.users-chipbar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.users-chipbar__chipwrap {
+  position: relative;
+}
+
+.users-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.users-chip:hover,
+.users-chip--active {
+  border-color: rgba(123, 30, 43, 0.28);
+  box-shadow: 0 8px 18px rgba(123, 30, 43, 0.08);
+  transform: translateY(-1px);
+}
+
+.users-chip::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0.7;
+}
+
+.users-chip__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 5;
+  display: grid;
+  min-width: 170px;
+  padding: 8px;
+  gap: 4px;
+  border: 1px solid rgba(123, 30, 43, 0.12);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+}
+
+.users-chip__option {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  font-weight: 650;
+}
+
+.users-chip__option:hover,
+.users-chip__option--active {
+  background: #fef2f4;
+  color: var(--color-primary);
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1347,6 +1455,21 @@
   min-width: 0;
   flex: 1;
   white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .users-form__submit {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .users-chipbar {
+    align-items: stretch;
+  }
+
+  .users-chipbar__search {
+    flex-basis: 100%;
+  }
 }
 
 .mt-16 {
