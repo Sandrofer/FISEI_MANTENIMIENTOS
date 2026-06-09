@@ -34,7 +34,7 @@ class SignalRService {
 
     this.connection.on('RecibirNotificacion', (notificacion: NotificacionDto) => {
       toast(notificacion.mensaje, {
-        icon: notificacion.tipo === 'COMPLETADO' ? 'OK' : '!',
+        icon: ['COMPLETADO', 'ESTADO_FINALIZADO'].includes(notificacion.tipo) ? 'OK' : '!',
         duration: 5000
       });
       window.dispatchEvent(new CustomEvent('fisei:notificacion-recibida'));

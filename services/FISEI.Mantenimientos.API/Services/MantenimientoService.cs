@@ -143,6 +143,15 @@ namespace FISEI.Mantenimientos.API.Services
                     detalle.EquipoId);
             }
 
+            var primerDetalle = casoMaestro.DetallesMantenimientos.FirstOrDefault();
+            if (primerDetalle != null)
+            {
+                await _notificacionesClient.EnviarCierreAsync(
+                    casoMaestro.CreadoPorUsuarioId,
+                    casoMaestro.CodigoCaso,
+                    primerDetalle.EquipoId);
+            }
+
             return casoMaestro;
         }
 
@@ -191,6 +200,15 @@ namespace FISEI.Mantenimientos.API.Services
                     detalle.LaboratoristaAsignadoId,
                     detalle.Caso.CodigoCaso,
                     detalle.EquipoId);
+            }
+
+            if (estadoAnterior != detalle.EstadoIndividual && EsEstadoTecnicoNotificable(detalle.EstadoIndividual))
+            {
+                await _notificacionesClient.EnviarCambioEstadoAdminAsync(
+                    detalle.Caso.CreadoPorUsuarioId,
+                    detalle.Caso.CodigoCaso,
+                    detalle.EquipoId,
+                    detalle.EstadoIndividual);
             }
 
             return detalle;
@@ -261,7 +279,20 @@ namespace FISEI.Mantenimientos.API.Services
                 detalle.Caso.CodigoCaso,
                 detalle.EquipoId);
 
+            await _notificacionesClient.EnviarCambioEstadoAdminAsync(
+                detalle.Caso.CreadoPorUsuarioId,
+                detalle.Caso.CodigoCaso,
+                detalle.EquipoId,
+                detalle.EstadoIndividual);
+
             return detalle;
+        }
+
+        private static bool EsEstadoTecnicoNotificable(string estado)
+        {
+            return estado == "En Proceso"
+                || estado == "Finalizado"
+                || estado == "No Reparado (De Baja)";
         }
     }
 }

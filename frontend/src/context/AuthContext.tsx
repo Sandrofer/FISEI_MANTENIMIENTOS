@@ -26,7 +26,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    if (usuario?.rol === 'Laboratorista' && usuario.userId && usuario.token) {
+    const rolesConNotificaciones = ['Laboratorista', 'Administrador'];
+
+    if (usuario?.rol && rolesConNotificaciones.includes(usuario.rol) && usuario.userId && usuario.token) {
       let activo = true;
       signalRService.conectar(usuario.userId, usuario.token).catch((error) => {
         if (activo) {

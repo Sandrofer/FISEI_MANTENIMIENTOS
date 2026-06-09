@@ -30,9 +30,13 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
   const [usuarios, setUsuarios] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let activo = true;
+
+    const fetchData = async (mostrarCarga = true) => {
       try {
-        setLoading(true);
+        if (mostrarCarga) {
+          setLoading(true);
+        }
         // Fetch order, teams, and users concurrently
         const [ordenData, equiposData, usuariosData] = await Promise.all([
           obtenerOrdenPorId(ordenId),
@@ -40,17 +44,34 @@ export const DetalleOrdenPage: React.FC<DetalleOrdenPageProps> = ({ ordenId, onV
           getUsuarios(1, 1000).catch(() => ({ datos: [] }))
         ]);
 
-        setOrden(ordenData);
-        setEquipos(equiposData);
-        setUsuarios(usuariosData.datos || []);
+        if (activo) {
+          setOrden(ordenData);
+          setEquipos(equiposData);
+          setUsuarios(usuariosData.datos || []);
+        }
       } catch (err) {
         console.error(err);
-        setError('No se pudo cargar la orden.');
+        if (activo) {
+          setError('No se pudo cargar la orden.');
+        }
       } finally {
-        setLoading(false);
+        if (activo && mostrarCarga) {
+          setLoading(false);
+        }
       }
     };
+
     fetchData();
+
+    const onNotificacion = () => {
+      void fetchData(false);
+    };
+
+    window.addEventListener('fisei:notificacion-recibida', onNotificacion);
+    return () => {
+      activo = false;
+      window.removeEventListener('fisei:notificacion-recibida', onNotificacion);
+    };
   }, [ordenId]);
 
   useEffect(() => {
