@@ -287,14 +287,14 @@ namespace FISEI.Mantenimientos.API.Services
 
             return detalle;
         }
-<<<<<<< Updated upstream
 
         private static bool EsEstadoTecnicoNotificable(string estado)
         {
             return estado == "En Proceso"
                 || estado == "Finalizado"
                 || estado == "No Reparado (De Baja)";
-=======
+        }
+
         public async Task<System.Collections.Generic.List<MantenimientoEquipoDto>> ObtenerMantenimientosPorEquipoAsync(Guid equipoId)
         {
             var detalles = await _dbContext.DetallesMantenimientos
@@ -320,7 +320,6 @@ namespace FISEI.Mantenimientos.API.Services
                                      (!string.IsNullOrEmpty(d.DescripcionDetalladaMantenimiento) ? "\n" + d.DescripcionDetalladaMantenimiento : ""),
                 Observaciones = d.Caso.DescripcionGeneral
             }).ToList();
->>>>>>> Stashed changes
         }
     }
 }
